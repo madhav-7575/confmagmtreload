@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS — Conference Management System</title>
+<script>(function(){const t=localStorage.getItem("cms_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
+<style>
+:root{--ink:#1a1040;--ink-2:#5b5484;--ink-3:#9590b0;--paper:#f7f5ff;--card:#ffffff;--border:#ebe5ff;--border-2:#d5cbff;--violet:#5b3df6;--violet-d:#3f20d4;--violet-dd:#2c1c8f;--violet-t:#ede9ff;--violet-t2:#f5f2ff;--coral:#ff6b4a;--coral-d:#e5502f;--coral-t:#fff2ee;--teal:#00c896;--teal-t:#e0fff6;--amber:#f5a623;--amber-t:#fff8e6;--rose:#e5484d;--rose-t:#ffeaea;--sh-lg:0 20px 50px rgba(91,61,246,.18);}
+[data-theme="dark"]{--ink:#e8e3ff;--ink-2:#9d96c8;--ink-3:#6b6489;--paper:#0d0b1a;--card:#16132a;--border:#2a2448;--border-2:#3d3570;--violet-t:#1e1640;--violet-t2:#18122e;--coral-t:#2a1410;--teal-t:#071f18;--amber-t:#1f1608;--rose-t:#1f0b0c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;transition:background .3s,color .3s;}
+.topbar{height:58px;background:rgba(255,255,255,.85);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;position:sticky;top:0;z-index:100;transition:background .3s;}
+[data-theme="dark"] .topbar{background:rgba(16,14,32,.88);}
+.brand{display:flex;align-items:center;gap:10px;font-family:Georgia,serif;font-weight:700;font-size:1.15rem;color:var(--violet);}
+.gem{width:30px;height:30px;background:linear-gradient(135deg,var(--violet),var(--coral));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:999px;font-size:.86rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .18s;}
+.btn-primary{background:linear-gradient(135deg,var(--violet),var(--violet-d));color:#fff;box-shadow:0 4px 14px rgba(91,61,246,.28);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(91,61,246,.36);}
+.btn-ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--border-2);}
+.btn-ghost:hover{background:var(--violet-t2);}
+.theme-pill{display:flex;align-items:center;background:var(--border);border-radius:999px;padding:3px;border:1px solid var(--border-2);cursor:pointer;}
+.theme-pill-track{width:44px;height:22px;position:relative;}
+.theme-pill-thumb{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:0;left:0;box-shadow:0 1px 4px rgba(0,0,0,.18);transition:transform .3s;display:flex;align-items:center;justify-content:center;font-size:.65rem;}
+[data-theme="dark"] .theme-pill-thumb{transform:translateX(22px);}
+.hero{max-width:1100px;margin:0 auto;padding:90px 28px 60px;text-align:center;}
+.hero h1{font-family:Georgia,serif;font-size:2.8rem;font-weight:800;line-height:1.15;margin-bottom:18px;}
+.hero h1 span{background:linear-gradient(135deg,var(--violet),var(--coral));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero p{color:var(--ink-2);font-size:1.05rem;max-width:600px;margin:0 auto 32px;line-height:1.7;}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.feature-grid{max-width:1100px;margin:70px auto;padding:0 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:26px;transition:transform .2s,box-shadow .2s,background .3s;}
+.feature-card:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(91,61,246,.12);}
+.feature-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:14px;}
+.feature-card h3{font-family:Georgia,serif;font-size:1.1rem;margin-bottom:8px;}
+.feature-card p{color:var(--ink-2);font-size:.88rem;line-height:1.6;}
+.roles-section{max-width:1100px;margin:70px auto;padding:0 28px;}
+.roles-section h2{font-family:Georgia,serif;font-size:1.8rem;text-align:center;margin-bottom:36px;}
+.roles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.role-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px;text-align:center;transition:transform .2s,box-shadow .2s;}
+.role-card:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(91,61,246,.12);}
+.role-emoji{font-size:2.4rem;margin-bottom:12px;}
+.role-card h3{font-family:Georgia,serif;font-size:1.15rem;margin-bottom:8px;}
+.role-card p{color:var(--ink-2);font-size:.85rem;line-height:1.6;margin-bottom:18px;}
+footer{text-align:center;padding:40px 28px;color:var(--ink-3);font-size:.82rem;border-top:1px solid var(--border);margin-top:40px;}
+@media(max-width:800px){.feature-grid,.roles-grid{grid-template-columns:1fr;}.hero h1{font-size:2rem;}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><div class="gem">◈</div>CMS</div>
+  <div class="topbar-right">
+    <button class="theme-pill" onclick="toggleTheme()">
+      <div class="theme-pill-track">
+        <div class="theme-pill-thumb" id="thumb">☀️</div>
+      </div>
+    </button>
+    <a href="login.html" class="btn btn-ghost">Login</a>
+    <a href="login.html" class="btn btn-primary">Get Started →</a>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>Manage conferences <span>end to end</span></h1>
+  <p>Submit papers, coordinate expert peer review, and publish results — all in one platform built for authors, reviewers, and administrators.</p>
+  <div class="hero-actions">
+    <a href="login.html" class="btn btn-primary" style="padding:12px 26px;">Sign In →</a>
+    <a href="login.html" class="btn btn-ghost" style="padding:12px 26px;">Create Account</a>
+  </div>
+</section>
+
+<section class="feature-grid">
+  <div class="feature-card">
+    <div class="feature-icon" style="background:var(--violet-t);">📄</div>
+    <h3>Submit Papers</h3>
+    <p>Upload your research, track its status, and manage every submission from one dashboard.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon" style="background:var(--teal-t);">🔍</div>
+    <h3>Expert Review</h3>
+    <p>Reviewers score and evaluate assigned papers with structured criteria and clear deadlines.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon" style="background:var(--amber-t);">🎓</div>
+    <h3>Certificates</h3>
+    <p>Accepted authors automatically receive downloadable certificates of acceptance and achievement.</p>
+  </div>
+</section>
+
+<section class="roles-section">
+  <h2>Built for every role</h2>
+  <div class="roles-grid">
+    <div class="role-card">
+      <div class="role-emoji">✍️</div>
+      <h3>Author</h3>
+      <p>Submit papers to open conferences, track review status, and download certificates once accepted.</p>
+      <a href="login.html" class="btn btn-ghost">Sign in as Author</a>
+    </div>
+    <div class="role-card">
+      <div class="role-emoji">🔍</div>
+      <h3>Reviewer</h3>
+      <p>Review assigned papers, score them against evaluation criteria, and submit expert feedback.</p>
+      <a href="login.html" class="btn btn-ghost">Sign in as Reviewer</a>
+    </div>
+    <div class="role-card">
+      <div class="role-emoji">⚙️</div>
+      <h3>Admin</h3>
+      <p>Create conferences, assign reviewers, publish results, and monitor platform-wide analytics.</p>
+      <a href="login.html" class="btn btn-ghost">Sign in as Admin</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 Conference Management System · Built with Flask + SQLite
+</footer>
+
+<script>
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur==="dark"?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next);
+  localStorage.setItem("cms_theme",next);
+  document.getElementById("thumb").textContent = next==="dark"?"🌙":"☀️";
+}
+document.getElementById("thumb").textContent = document.documentElement.getAttribute("data-theme")==="dark"?"🌙":"☀️";
+
+/* If already logged in, offer quick redirect */
+(function(){
+  try{
+    const s = JSON.parse(localStorage.getItem("cms_session")||"null");
+    if(s && s.role){
+      const bar = document.querySelector(".hero-actions");
+      const a = document.createElement("a");
+      a.href = `${s.role}_dashboard.html`;
+      a.className = "btn btn-primary";
+      a.style.padding = "12px 26px";
+      a.textContent = `Continue as ${s.name.split(" ")[0]} →`;
+      bar.prepend(a);
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

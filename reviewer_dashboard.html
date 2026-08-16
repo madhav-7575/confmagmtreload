@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS — Reviewer Dashboard</title>
+<script>(function(){const t=localStorage.getItem("cms_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
+<style>
+:root{--ink:#1a1040;--ink-2:#5b5484;--ink-3:#9590b0;--paper:#f7f5ff;--card:#ffffff;--border:#ebe5ff;--border-2:#d5cbff;--violet:#5b3df6;--violet-d:#3f20d4;--violet-dd:#2c1c8f;--violet-t:#ede9ff;--violet-t2:#f5f2ff;--coral:#ff6b4a;--coral-d:#e5502f;--coral-t:#fff2ee;--teal:#00c896;--teal-t:#e0fff6;--amber:#f5a623;--amber-t:#fff8e6;--rose:#e5484d;--rose-t:#ffeaea;--sh-md:0 8px 28px rgba(91,61,246,.12);--sh-lg:0 20px 50px rgba(91,61,246,.18);}
+[data-theme="dark"]{--ink:#e8e3ff;--ink-2:#9d96c8;--ink-3:#6b6489;--paper:#0d0b1a;--card:#16132a;--border:#2a2448;--border-2:#3d3570;--violet-t:#1e1640;--violet-t2:#18122e;--coral-t:#2a1410;--teal-t:#071f18;--amber-t:#1f1608;--rose-t:#1f0b0c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--paper);color:var(--ink);display:flex;flex-direction:column;min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 10% 0%,rgba(91,61,246,.08) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 90% 5%,rgba(0,200,150,.06) 0%,transparent 55%),var(--paper);transition:background .3s;}
+
+/* ── TOPBAR ── */
+.topbar{height:58px;background:rgba(255,255,255,.85);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(91,61,246,.07);transition:background .3s;}
+[data-theme="dark"] .topbar{background:rgba(16,14,32,.88);}
+.topbar-brand{font-family:Georgia,serif;font-weight:700;font-size:1.1rem;color:var(--violet);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.topbar-gem{width:28px;height:28px;background:linear-gradient(135deg,var(--teal),var(--violet));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem;box-shadow:0 3px 10px rgba(0,200,150,.3);}
+.topbar-search{flex:1;max-width:340px;position:relative;margin-left:24px;}
+.topbar-search input{width:100%;padding:8px 14px 8px 36px;border:1.5px solid var(--border);border-radius:999px;font-size:.85rem;background:var(--paper);color:var(--ink);transition:border-color .2s,background .3s;}
+.topbar-search input:focus{outline:none;border-color:var(--violet);background:var(--card);}
+.topbar-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-3);}
+[data-theme="dark"] .topbar-search input{background:#0f0d1e;border-color:#2a2448;color:#e8e3ff;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.theme-pill{display:flex;align-items:center;background:var(--border);border-radius:999px;padding:3px;border:1px solid var(--border-2);cursor:pointer;transition:background .3s;}
+[data-theme="dark"] .theme-pill{background:#1e1640;border-color:#3d3570;}
+.theme-pill-track{width:44px;height:22px;position:relative;}
+.theme-pill-thumb{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:0;left:0;box-shadow:0 1px 4px rgba(0,0,0,.18);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center;font-size:.65rem;}
+[data-theme="dark"] .theme-pill-thumb{transform:translateX(22px);}
+.theme-sun,.theme-moon{position:absolute;top:50%;transform:translateY(-50%);font-size:.6rem;pointer-events:none;}
+.theme-sun{left:4px;}.theme-moon{right:4px;}
+.notif-btn{position:relative;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:background .2s;}
+.notif-btn:hover{background:var(--teal-t);}
+.notif-badge{position:absolute;top:3px;right:3px;width:8px;height:8px;background:var(--coral);border-radius:50%;border:2px solid var(--card);}
+.profile-pill{display:flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;transition:background .2s;}
+.profile-pill:hover{background:var(--teal-t);}
+.avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--violet));display:flex;align-items:center;justify-content:center;font-size:.78rem;color:#fff;font-weight:700;}
+.profile-name{font-size:.82rem;font-weight:600;color:var(--ink);}
+.dropdown-wrap{position:relative;}
+.dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border:1px solid var(--border-2);border-radius:14px;padding:6px;min-width:190px;box-shadow:var(--sh-lg);display:none;z-index:999;animation:dropIn .18s ease;}
+[data-theme="dark"] .dropdown{background:#16132a;border-color:#3d3570;}
+.dropdown.open{display:block;}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.drop-header{padding:10px 12px;border-bottom:1px solid var(--border);margin-bottom:4px;}
+.drop-name{font-weight:700;font-size:.88rem;color:var(--ink);}
+.drop-role{font-size:.73rem;color:var(--teal);margin-top:1px;font-weight:600;}
+.drop-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;font-size:.84rem;color:var(--ink);cursor:pointer;border:none;background:none;width:100%;text-align:left;text-decoration:none;transition:background .15s;}
+.drop-item:hover{background:var(--violet-t2);}
+.drop-item.danger{color:var(--rose);}
+.drop-item.danger:hover{background:var(--rose-t);}
+.drop-sep{height:1px;background:var(--border);margin:4px 0;}
+
+/* ── SHELL ── */
+.shell{display:flex;flex:1;}
+.sidebar{width:220px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px 0;overflow-y:auto;position:sticky;top:58px;height:calc(100vh - 58px);transition:background .3s,border-color .3s;}
+[data-theme="dark"] .sidebar{background:#100e20;border-color:#2a2448;}
+.sidebar-label{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);padding:10px 18px 4px;margin-top:6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;margin:1px 8px;border-radius:10px;cursor:pointer;font-size:.875rem;font-weight:500;color:var(--ink-2);text-decoration:none;border:none;background:none;width:calc(100% - 16px);text-align:left;transition:background .18s,color .18s;}
+.nav-item:hover{background:var(--teal-t);color:var(--ink);}
+.nav-item.active{background:var(--teal-t);color:#0a7a5a;font-weight:700;}
+.nav-icon{width:20px;text-align:center;font-size:1rem;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--amber);color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:999px;}
+.sidebar-bottom{margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--border);}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:28px 28px 40px;}
+.page-view{animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── COMPONENTS ── */
+.greeting-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.greeting-text h2{font-family:Georgia,serif;font-size:1.6rem;font-weight:700;margin-bottom:4px;}
+.greeting-text p{color:var(--ink-2);font-size:.9rem;}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-c{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s,background .3s;}
+[data-theme="dark"] .stat-c{background:#16132a;border-color:#2a2448;}
+.stat-c:hover{transform:translateY(-2px);box-shadow:var(--sh-md);}
+.stat-c-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:10px;}
+.stat-c-num{font-family:Georgia,serif;font-size:2rem;font-weight:800;line-height:1;}
+.stat-c-sub{font-size:.75rem;color:var(--ink-2);margin-top:6px;}
+.stat-c-icon{position:absolute;right:16px;top:16px;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.stat-c-glow{position:absolute;width:80px;height:80px;border-radius:50%;opacity:.1;bottom:-20px;right:-10px;}
+.sv .stat-c-num{color:var(--violet);}.sv .stat-c-icon{background:var(--violet-t);}.sv .stat-c-glow{background:var(--violet);}
+.sg .stat-c-num{color:var(--teal);}.sg .stat-c-icon{background:var(--teal-t);}.sg .stat-c-glow{background:var(--teal);}
+.sa .stat-c-num{color:var(--amber);}.sa .stat-c-icon{background:var(--amber-t);}.sa .stat-c-glow{background:var(--amber);}
+.sc .stat-c-num{color:var(--coral);}.sc .stat-c-icon{background:var(--coral-t);}.sc .stat-c-glow{background:var(--coral);}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:background .3s,border-color .3s;}
+[data-theme="dark"] .panel{background:#16132a;border-color:#2a2448;}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.panel-head h3{font-family:Georgia,serif;font-size:1rem;font-weight:700;}
+.panel-head a,.panel-head button{font-size:.78rem;font-weight:600;color:var(--teal);text-decoration:none;background:none;border:none;cursor:pointer;}
+.panel-body{padding:0;}
+
+.chart-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:18px;overflow:hidden;transition:background .3s;}
+[data-theme="dark"] .chart-panel{background:#16132a;border-color:#2a2448;}
+.chart-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.chart-head h3{font-family:Georgia,serif;font-size:1rem;font-weight:700;}
+.chart-body{padding:20px;}
+
+table{width:100%;border-collapse:collapse;}
+thead{background:linear-gradient(90deg,var(--teal-t),#e0fff6);}
+[data-theme="dark"] thead{background:linear-gradient(90deg,#071f18,#0e2f22);}
+th{text-align:left;padding:12px 16px;font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);border-bottom:1.5px solid var(--border);}
+td{padding:13px 16px;font-size:.87rem;border-bottom:1px solid var(--border);vertical-align:middle;}
+tbody tr{transition:background .15s;}
+tbody tr:hover{background:var(--teal-t);}
+tbody tr:last-child td{border-bottom:none;}
+
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700;border:1px solid transparent;}
+.badge-submitted{background:#ede9ff;color:#4f2dcc;border-color:#c8baff;}
+.badge-review{background:var(--amber-t);color:#9a6510;border-color:#f5d080;}
+.badge-accepted{background:var(--teal-t);color:#0a7a5a;border-color:#6ddbb9;}
+.badge-rejected{background:var(--rose-t);color:#b91c1c;border-color:#fcb5b7;}
+[data-theme="dark"] .badge-submitted{background:#1e1640;color:#a78bfa;border-color:#3d3570;}
+[data-theme="dark"] .badge-review{background:#1f1608;color:#fbbf24;border-color:#3a2b10;}
+[data-theme="dark"] .badge-accepted{background:#071f18;color:#34d399;border-color:#0e3028;}
+[data-theme="dark"] .badge-rejected{background:#1f0b0c;color:#f87171;border-color:#3d1014;}
+
+.action-btn{padding:5px 12px;border-radius:999px;font-size:.76rem;font-weight:700;cursor:pointer;border:none;transition:all .18s;}
+.ab-teal{background:var(--teal-t);color:#0a7a5a;border:1px solid #6ddbb9;}.ab-teal:hover{background:#b3edd9;}
+.ab-violet{background:var(--violet-t);color:var(--violet-d);border:1px solid #c8baff;}.ab-violet:hover{background:#ddd5ff;}
+.ab-amber{background:var(--amber-t);color:#9a6510;border:1px solid #f5d080;}.ab-amber:hover{background:#fde9b8;}
+.ab-red{background:var(--rose-t);color:#b91c1c;border:1px solid #fcb5b7;}.ab-red:hover{background:#ffd0d1;}
+
+.qbtn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;font-size:.84rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .18s;}
+.qbtn-teal{background:linear-gradient(135deg,var(--teal),#00a07a);color:#fff;box-shadow:0 4px 14px rgba(0,200,150,.28);}.qbtn-teal:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,200,150,.38);}
+.qbtn-ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--border-2);}.qbtn-ghost:hover{background:var(--teal-t);border-color:var(--teal);color:#0a7a5a;}
+
+/* Review form */
+.review-form-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;transition:background .3s;}
+[data-theme="dark"] .review-form-card{background:#16132a;border-color:#2a2448;}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.fg label{font-size:.77rem;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em;}
+.fg input,.fg select,.fg textarea{padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:.88rem;font-family:inherit;color:var(--ink);background:var(--paper);transition:border-color .18s,background .3s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--teal);background:var(--card);box-shadow:0 0 0 3px rgba(0,200,150,.1);}
+[data-theme="dark"] .fg input,[data-theme="dark"] .fg select,[data-theme="dark"] .fg textarea{background:#0f0d1e;border-color:#2a2448;color:#e8e3ff;}
+[data-theme="dark"] .fg input:focus,[data-theme="dark"] .fg select:focus,[data-theme="dark"] .fg textarea:focus{background:#16132a;border-color:var(--teal);}
+.fg textarea{resize:vertical;min-height:100px;line-height:1.6;}
+
+/* Score dots */
+.score-dots{display:flex;gap:7px;flex-wrap:wrap;margin:6px 0;}
+.sdot{width:34px;height:34px;border-radius:50%;background:var(--border);border:2px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:var(--ink-3);transition:all .18s;}
+.sdot:hover:not(.active){background:var(--teal-t);border-color:var(--teal);color:#0a7a5a;}
+.sdot.active{background:var(--teal);border-color:#00a07a;color:#fff;box-shadow:0 0 0 3px rgba(0,200,150,.2);}
+[data-theme="dark"] .sdot{background:var(--border);color:var(--ink-3);}
+
+/* Decision buttons */
+.decision-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px;}
+.decision-btn{padding:14px;border-radius:12px;border:2px solid var(--border);background:var(--card);cursor:pointer;font-weight:700;font-size:.9rem;color:var(--ink-2);transition:all .2s;text-align:center;}
+.decision-btn:hover{transform:translateY(-1px);}
+.decision-btn.accept-active{border-color:var(--teal);background:var(--teal-t);color:#0a7a5a;box-shadow:0 0 0 3px rgba(0,200,150,.15);}
+.decision-btn.reject-active{border-color:var(--rose);background:var(--rose-t);color:#b91c1c;box-shadow:0 0 0 3px rgba(229,72,77,.15);}
+
+/* Paper detail panel */
+.paper-detail{background:var(--violet-t2);border:1px solid var(--border-2);border-radius:14px;padding:18px 20px;margin-bottom:18px;transition:background .3s;}
+[data-theme="dark"] .paper-detail{background:var(--violet-t);border-color:#3d3570;}
+.paper-detail-title{font-family:Georgia,serif;font-size:1.1rem;font-weight:700;margin-bottom:6px;}
+.paper-detail-meta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.paper-meta-chip{font-size:.78rem;color:var(--ink-2);display:flex;align-items:center;gap:4px;}
+.paper-abstract{font-size:.85rem;color:var(--ink-2);line-height:1.7;}
+
+/* History item */
+.history-item{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);}
+.history-item:last-child{border-bottom:none;}
+.history-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.history-info{flex:1;min-width:0;}
+.history-title{font-size:.85rem;font-weight:600;color:var(--ink);}
+.history-sub{font-size:.77rem;color:var(--ink-2);margin-top:3px;}
+.history-score{font-family:Georgia,serif;font-size:1.1rem;font-weight:800;flex-shrink:0;align-self:center;}
+
+/* Progress bar */
+.progress-bar-wrap{background:var(--border);border-radius:999px;height:6px;overflow:hidden;margin-top:4px;}
+.progress-bar-fill{height:100%;border-radius:999px;transition:width .4s ease;}
+
+.page-header{margin-bottom:24px;}
+.page-header h1{font-family:Georgia,serif;font-size:1.6rem;margin-bottom:4px;}
+.page-header p{color:var(--ink-2);font-size:.9rem;}
+
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.ftab{padding:5px 13px;border-radius:999px;border:1px solid var(--border);background:none;font-size:.75rem;font-weight:600;color:var(--ink-2);cursor:pointer;transition:all .18s;}
+.ftab.active,.ftab:hover{background:var(--teal-t);border-color:#6ddbb9;color:#0a7a5a;}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 22px;border-radius:999px;font-size:.85rem;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.25);opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:9999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:900px){.stats-row{grid-template-columns:1fr 1fr;}.two-col{grid-template-columns:1fr;}.sidebar{width:64px;}.sidebar .nav-item span:not(.nav-icon){display:none;}.sidebar-label{display:none;}.topbar-search{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-gem">🔍</div>
+    CMS <span style="font-size:.7rem;background:var(--teal-t);color:#0a7a5a;padding:2px 8px;border-radius:999px;margin-left:4px;font-family:inherit;font-weight:700;">Reviewer</span>
+  </div>
+  <div class="topbar-search">
+    <span class="topbar-search-icon">🔍</span>
+    <input type="text" placeholder="Search assigned papers…">
+  </div>
+  <button class="qbtn qbtn-ghost" style="margin-left:12px;" id="refresh-assigned-btn" onclick="loadAssigned(true)">🔄 Refresh</button>
+  <div class="topbar-right">
+    <button class="theme-pill" onclick="toggleTheme()">
+      <div class="theme-pill-track">
+        <span class="theme-sun">☀️</span><span class="theme-moon">🌙</span>
+        <div class="theme-pill-thumb" id="thumb">☀️</div>
+      </div>
+    </button>
+    <button class="notif-btn" onclick="showPage('notifications')">🔔<span class="notif-badge"></span></button>
+    <div class="dropdown-wrap">
+      <button class="profile-pill" onclick="toggleDrop()">
+        <div class="avatar" id="topbar-av">P</div>
+        <span class="profile-name" id="topbar-nm">Priya</span>
+        <span style="color:var(--ink-3);font-size:.68rem;">▾</span>
+      </button>
+      <div class="dropdown" id="profile-drop">
+        <div class="drop-header">
+          <div class="drop-name" id="drop-name">Priya Nair</div>
+          <div class="drop-role">🔍 Reviewer</div>
+        </div>
+        <a href="#" class="drop-item" onclick="showPage('profile')">👤 My Profile</a>
+        <a href="#" class="drop-item" onclick="showPage('settings')">⚙️ Settings</a>
+        <div class="drop-sep"></div>
+        <button class="drop-item danger" onclick="logout()">🚪 Logout</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-label">Dashboard</div>
+  <a class="nav-item active" href="#" onclick="showPage('overview')"><span class="nav-icon">🏠</span><span>Overview</span></a>
+  <a class="nav-item" href="#" onclick="showPage('assigned')"><span class="nav-icon">📋</span><span>Assigned Papers</span><span class="nav-badge" id="pending-badge">3</span></a>
+  <a class="nav-item" href="#" onclick="showPage('reviewed')"><span class="nav-icon">✅</span><span>Reviewed</span></a>
+  <a class="nav-item" href="#" onclick="showPage('notifications')"><span class="nav-icon">🔔</span><span>Notifications</span></a>
+  <div class="sidebar-label">Activity</div>
+  <a class="nav-item" href="#" onclick="showPage('history')"><span class="nav-icon">📊</span><span>Review History</span></a>
+  <div class="sidebar-bottom">
+    <a class="nav-item" href="#" onclick="showPage('profile')"><span class="nav-icon">👤</span><span>Profile</span></a>
+    <a class="nav-item" href="#" onclick="showPage('settings')"><span class="nav-icon">⚙</span><span>Settings</span></a>
+    <a class="nav-item" href="#" onclick="logout()" style="color:var(--rose);"><span class="nav-icon">🚪</span><span>Logout</span></a>
+  </div>
+</aside>
+
+<main class="main">
+
+<!-- ══ OVERVIEW ══ -->
+<div id="page-overview" class="page-view">
+  <div class="greeting-row">
+    <div class="greeting-text">
+      <h2 id="greeting">Good morning, Priya 👋</h2>
+      <p>You have papers waiting for your expert review.</p>
+    </div>
+    <button class="qbtn qbtn-teal" onclick="showPage('assigned')">📋 View Assigned Papers</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-c sv"><div class="stat-c-glow"></div><div class="stat-c-icon">📋</div><div class="stat-c-label">Assigned</div><div class="stat-c-num" id="s-assigned">5</div><div class="stat-c-sub">Total assigned</div></div>
+    <div class="stat-c sa"><div class="stat-c-glow"></div><div class="stat-c-icon">⏳</div><div class="stat-c-label">Pending</div><div class="stat-c-num" id="s-pending">3</div><div class="stat-c-sub">Need review</div></div>
+    <div class="stat-c sg"><div class="stat-c-glow"></div><div class="stat-c-icon">✅</div><div class="stat-c-label">Completed</div><div class="stat-c-num" id="s-done">2</div><div class="stat-c-sub">This month</div></div>
+    <div class="stat-c sc"><div class="stat-c-glow"></div><div class="stat-c-icon">⭐</div><div class="stat-c-label">Avg Score Given</div><div class="stat-c-num">7.4</div><div class="stat-c-sub">Out of 10</div></div>
+  </div>
+
+  <!-- Workload + Pending -->
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-head"><h3>Pending Reviews</h3><a href="#" onclick="showPage('assigned')">View All →</a></div>
+      <div class="panel-body">
+        <table>
+          <thead><tr><th>Paper</th><th>Conference</th><th>Deadline</th><th>Action</th></tr></thead>
+          <tbody id="pending-reviews-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Review Progress</h3></div>
+      <div class="panel-body" style="padding:16px 20px;">
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:6px;"><span style="font-weight:600;">Overall Completion</span><span id="stat-overall-percent" style="color:var(--teal);font-weight:700;">40%</span></div>
+          <div class="progress-bar-wrap"><div id="progress-overall-fill" class="progress-bar-fill" style="width:40%;background:var(--teal);"></div></div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:6px;"><span style="font-weight:600;">This Month Target</span><span id="stat-month-percent" style="color:var(--amber);font-weight:700;">60%</span></div>
+          <div class="progress-bar-wrap"><div id="progress-month-fill" class="progress-bar-fill" style="width:60%;background:var(--amber);"></div></div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:6px;"><span style="font-weight:600;">Response Time (avg)</span><span id="stat-response-text" style="color:var(--violet);font-weight:700;">4.2 days</span></div>
+          <div class="progress-bar-wrap"><div id="progress-response-fill" class="progress-bar-fill" style="width:70%;background:var(--violet);"></div></div>
+        </div>
+        <div id="urgent-note" style="background:var(--teal-t);border-radius:10px;padding:12px;margin-top:14px;border:1px solid #6ddbb9;">
+          <div style="font-size:.78rem;font-weight:700;color:#0a7a5a;margin-bottom:4px;">⚡ Urgent</div>
+          <div id="urgent-text" style="font-size:.83rem;color:var(--ink);">"AI in Healthcare" review due in <strong id="urgent-days" style="color:var(--rose);">3 days</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Activity Chart -->
+  <div class="chart-panel">
+    <div class="chart-head">
+      <h3>Review Activity</h3>
+      <div style="display:flex;gap:4px;">
+        <button class="ftab active" onclick="switchRevChart('reviews',this)">Reviews</button>
+        <button class="ftab" onclick="switchRevChart('scores',this)">Avg Scores</button>
+      </div>
+    </div>
+    <div class="chart-body"><canvas id="reviewerChart" height="85"></canvas></div>
+  </div>
+</div>
+
+<!-- ══ ASSIGNED PAPERS ══ -->
+<div id="page-assigned" class="page-view" style="display:none;">
+  <div class="page-header">
+    <h1>Assigned Papers</h1>
+    <p>Papers assigned to you for expert peer review.</p>
+  </div>
+  <div class="filter-row">
+    <button class="ftab active" onclick="filterAssigned('all',this)">All (5)</button>
+    <button class="ftab" onclick="filterAssigned('pending',this)">Pending (3)</button>
+    <button class="ftab" onclick="filterAssigned('done',this)">Reviewed (2)</button>
+  </div>
+  <div class="panel">
+    <div class="panel-body">
+      <table>
+        <thead><tr><th>Title</th><th>Author</th><th>Conference</th><th>Submitted</th><th>Deadline</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600;">AI in Healthcare Systems</td><td style="color:var(--ink-2);">Madhav Kumar</td><td style="color:var(--ink-2);font-size:.83rem;">ICAI 2026</td><td style="color:var(--ink-3);font-size:.82rem;">12 Jan</td><td style="color:var(--rose);font-weight:600;font-size:.82rem;">3 days</td><td><span class="badge badge-review">Pending</span></td><td><button class="action-btn ab-teal" onclick="openReviewForm('AI in Healthcare Systems','ICAI 2026')">📝 Review</button></td></tr>
+          <tr><td style="font-weight:600;">Smart City Architecture</td><td style="color:var(--ink-2);">Kavitha S.</td><td style="color:var(--ink-2);font-size:.83rem;">SmartTech</td><td style="color:var(--ink-3);font-size:.82rem;">18 Feb</td><td style="color:var(--amber);font-weight:600;font-size:.82rem;">7 days</td><td><span class="badge badge-review">Pending</span></td><td><button class="action-btn ab-teal" onclick="openReviewForm('Smart City Architecture','SmartTech 2026')">📝 Review</button></td></tr>
+          <tr><td style="font-weight:600;">Blockchain in Education</td><td style="color:var(--ink-2);">Ravi M.</td><td style="color:var(--ink-2);font-size:.83rem;">EduConf</td><td style="color:var(--ink-3);font-size:.82rem;">5 Mar</td><td style="color:var(--ink-2);font-size:.82rem;">12 days</td><td><span class="badge badge-review">Pending</span></td><td><button class="action-btn ab-teal" onclick="openReviewForm('Blockchain in Education','EduConf 2026')">📝 Review</button></td></tr>
+          <tr><td style="font-weight:600;">IoT Security Framework</td><td style="color:var(--ink-2);">Anand R.</td><td style="color:var(--ink-2);font-size:.83rem;">IoTConf</td><td style="color:var(--ink-3);font-size:.82rem;">3 Feb</td><td style="color:var(--ink-3);font-size:.82rem;">—</td><td><span class="badge badge-accepted">Reviewed</span></td><td><button class="action-btn ab-violet" onclick="showToast('Review already submitted')">✓ Done</button></td></tr>
+          <tr><td style="font-weight:600;">Deep Learning NLP</td><td style="color:var(--ink-2);">Preethi K.</td><td style="color:var(--ink-2);font-size:.83rem;">NLP Summit</td><td style="color:var(--ink-3);font-size:.82rem;">5 Nov</td><td style="color:var(--ink-3);font-size:.82rem;">—</td><td><span class="badge badge-accepted">Reviewed</span></td><td><button class="action-btn ab-violet" onclick="showToast('Review already submitted')">✓ Done</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REVIEW FORM PAGE ══ -->
+<div id="page-review-form" class="page-view" style="display:none;">
+  <div style="display:flex;align-items:center;gap:8px;font-size:.83rem;color:var(--ink-2);margin-bottom:20px;">
+    <a href="#" onclick="showPage('assigned')" style="color:var(--ink-2);text-decoration:none;">Assigned Papers</a>
+    <span>›</span>
+    <span id="breadcrumb-paper" style="color:var(--ink);font-weight:600;">Review Paper</span>
+  </div>
+
+  <div class="page-header"><h1>Review Paper</h1><p>Read the paper carefully and submit your expert evaluation.</p></div>
+
+  <!-- Paper detail -->
+  <div class="paper-detail">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
+      <div class="paper-detail-title" id="review-paper-title">AI in Healthcare Systems</div>
+      <a id="download-link" href="#" target="_blank" style="display:flex;align-items:center;gap:6px;background:var(--violet-t);border:1px solid var(--border-2);color:var(--violet-d);padding:7px 14px;border-radius:999px;font-size:.8rem;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:background .2s;" onmouseover="this.style.background='#ddd5ff'" onmouseout="this.style.background=''">📎 Download PDF</a>
+    </div>
+      <div class="paper-detail-meta">
+      <span class="paper-meta-chip">👤 <span id="review-author">Madhav Kumar</span></span>
+      <span class="paper-meta-chip">📅 <span id="review-conf">ICAI 2026</span></span>
+      <span class="paper-meta-chip">📍 Chennai</span>
+    </div>
+      <input type="hidden" id="review-paper-id" value="">
+    <div class="paper-abstract">This paper proposes an AI-driven system for early diagnosis of chronic diseases using patient data from electronic health records. The system employs a hybrid deep learning model combining LSTM and CNN architectures to predict disease onset with 92% accuracy, outperforming baseline models on benchmark datasets.</div>
+  </div>
+
+  <div class="review-form-card">
+    <!-- Score -->
+    <div class="fg">
+      <label>Score (0 – 10) <span style="color:var(--rose);">*</span></label>
+      <div class="score-dots" id="score-dots"></div>
+      <input type="hidden" id="score-val" value="">
+      <p style="font-size:.73rem;color:var(--ink-3);margin-top:2px;" id="score-hint">Click a dot to select your score</p>
+    </div>
+
+    <!-- Decision -->
+    <div class="fg">
+      <label>Decision <span style="color:var(--rose);">*</span></label>
+      <div class="decision-grid">
+        <button type="button" id="btn-accept" class="decision-btn" onclick="setDecision('Accept')">✅ Accept</button>
+        <button type="button" id="btn-reject" class="decision-btn" onclick="setDecision('Reject')">❌ Reject</button>
+      </div>
+      <input type="hidden" id="decision-val" value="">
+    </div>
+
+    <!-- Comment -->
+    <div class="fg">
+      <label>Review Comments</label>
+      <textarea id="review-comment" placeholder="Provide constructive feedback — mention strengths, weaknesses, and suggestions for improvement…" style="min-height:130px;"></textarea>
+    </div>
+
+    <!-- Criteria checkboxes -->
+    <div class="fg">
+      <label>Evaluation Criteria</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:.84rem;cursor:pointer;font-weight:normal;text-transform:none;letter-spacing:0;color:var(--ink);">
+          <input type="checkbox" style="width:auto;accent-color:var(--teal);"> Originality
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:.84rem;cursor:pointer;font-weight:normal;text-transform:none;letter-spacing:0;color:var(--ink);">
+          <input type="checkbox" style="width:auto;accent-color:var(--teal);"> Technical Quality
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:.84rem;cursor:pointer;font-weight:normal;text-transform:none;letter-spacing:0;color:var(--ink);">
+          <input type="checkbox" style="width:auto;accent-color:var(--teal);"> Clarity of Writing
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:.84rem;cursor:pointer;font-weight:normal;text-transform:none;letter-spacing:0;color:var(--ink);">
+          <input type="checkbox" style="width:auto;accent-color:var(--teal);"> Relevance to Conference
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:.84rem;cursor:pointer;font-weight:normal;text-transform:none;letter-spacing:0;color:var(--ink);">
+          <input type="checkbox" style="width:auto;accent-color:var(--teal);"> Adequate References
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:.84rem;cursor:pointer;font-weight:normal;text-transform:none;letter-spacing:0;color:var(--ink);">
+          <input type="checkbox" style="width:auto;accent-color:var(--teal);"> Experimental Validation
+        </label>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="qbtn qbtn-teal" onclick="submitReview()">Submit Review ✓</button>
+      <button class="qbtn qbtn-ghost" onclick="showPage('assigned')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REVIEWED (completed) ══ -->
+<div id="page-reviewed" class="page-view" style="display:none;">
+  <div class="page-header"><h1>Completed Reviews</h1><p>Papers you have already reviewed.</p></div>
+  <div class="panel">
+    <div class="panel-body">
+      <table>
+        <thead><tr><th>Paper</th><th>Conference</th><th>Score Given</th><th>Decision</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600;">IoT Security Framework</td><td style="color:var(--ink-2);font-size:.83rem;">IoTConf 2026</td><td><span style="font-weight:700;color:var(--teal);font-size:1rem;">8</span><span style="color:var(--ink-3);font-size:.8rem;">/10</span></td><td><span style="color:var(--teal);font-weight:700;">✅ Accept</span></td><td style="color:var(--ink-3);font-size:.82rem;">15 Mar 2026</td><td><span class="badge badge-accepted">Published</span></td></tr>
+          <tr><td style="font-weight:600;">Deep Learning NLP</td><td style="color:var(--ink-2);font-size:.83rem;">NLP Summit</td><td><span style="font-weight:700;color:var(--teal);font-size:1rem;">9</span><span style="color:var(--ink-3);font-size:.8rem;">/10</span></td><td><span style="color:var(--teal);font-weight:700;">✅ Accept</span></td><td style="color:var(--ink-3);font-size:.82rem;">10 Dec 2025</td><td><span class="badge badge-accepted">Published</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REVIEW HISTORY ══ -->
+<div id="page-history" class="page-view" style="display:none;">
+  <div class="page-header"><h1>Review History</h1><p>Your complete review activity and statistics.</p></div>
+
+  <div class="two-col" style="margin-bottom:18px;">
+    <div class="chart-panel" style="margin-bottom:0;">
+      <div class="chart-head"><h3>Monthly Reviews</h3></div>
+      <div class="chart-body"><canvas id="historyChart" height="120"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Score Distribution</h3></div>
+      <div class="panel-body" style="padding:16px 20px;">
+        <canvas id="scoreChart" height="180"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h3>All Reviews</h3></div>
+    <div class="panel-body" style="padding:16px 20px;">
+      <div id="review-history-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NOTIFICATIONS ══ -->
+<div id="page-notifications" class="page-view" style="display:none;">
+  <div class="page-header"><h1>Notifications</h1></div>
+  <div class="panel">
+    <div class="panel-head"><h3>Recent</h3><button onclick="markAllNotificationsRead()">Mark all read</button></div>
+    <div class="panel-body" style="padding:16px 20px;">
+      <div id="notif-list">
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--violet);flex-shrink:0;margin-top:5px;"></div>
+          <div><div style="font-size:.85rem;color:var(--ink);">New paper <strong>"AI in Healthcare Systems"</strong> assigned to you for review.</div><div style="font-size:.72rem;color:var(--ink-3);margin-top:3px;">2 hours ago</div></div>
+        </div>
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--violet);flex-shrink:0;margin-top:5px;"></div>
+          <div><div style="font-size:.85rem;color:var(--ink);">Review for <strong>"IoT Security Framework"</strong> has been published by admin.</div><div style="font-size:.72rem;color:var(--ink-3);margin-top:3px;">1 day ago</div></div>
+        </div>
+        <div style="display:flex;gap:12px;padding:12px 0;">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;margin-top:5px;"></div>
+          <div><div style="font-size:.85rem;color:var(--ink-2);">Deadline reminder: <strong>"Smart City Architecture"</strong> review due in 7 days.</div><div style="font-size:.72rem;color:var(--ink-3);margin-top:3px;">2 days ago</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROFILE ══ -->
+<div id="page-profile" class="page-view" style="display:none;">
+  <div class="page-header"><h1>My Profile</h1></div>
+  <div style="background:linear-gradient(135deg,#00c896,var(--violet));border-radius:20px;padding:28px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(circle 200px at 80% 40%,rgba(255,255,255,.1),transparent 70%);pointer-events:none;"></div>
+    <div style="position:relative;z-index:2;display:flex;align-items:center;gap:18px;">
+      <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;color:#fff;" id="profile-av">P</div>
+      <div>
+        <h2 id="profile-name-h" style="font-family:Georgia,serif;font-size:1.4rem;margin-bottom:4px;">Priya Nair</h2>
+        <p id="profile-email-h" style="opacity:.8;font-size:.88rem;">priya@reviewer.com</p>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:600;">🔍 Reviewer</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:600;">📋 5 Papers Assigned</span>
+          <span style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:600;">⭐ 7.4 Avg Score</span>
+        </div>
+      </div>
+      <button onclick="saveProfile()" style="margin-left:auto;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;padding:9px 18px;border-radius:999px;cursor:pointer;font-size:.85rem;font-weight:600;flex-shrink:0;">✏️ Edit</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <div class="review-form-card">
+      <h3 style="font-family:Georgia,serif;margin-bottom:16px;">Personal Information</h3>
+      <div class="fg"><label>Full Name</label><input type="text" id="p-name" value="Priya Nair"></div>
+      <div class="fg"><label>Email</label><input type="email" value="priya@reviewer.com" readonly style="background:var(--teal-t);cursor:not-allowed;"></div>
+      <div class="fg"><label>College / Institution</label><input type="text" value="NIT Trichy"></div>
+      <div class="fg"><label>Expertise Area</label><input type="text" value="AI, Machine Learning, IoT"></div>
+      <button class="qbtn qbtn-teal" onclick="saveProfile()" style="margin-top:4px;">💾 Save Changes</button>
+    </div>
+    <div class="review-form-card">
+      <h3 style="font-family:Georgia,serif;margin-bottom:16px;">Review Statistics</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:var(--teal-t);border-radius:12px;padding:14px;text-align:center;"><div style="font-family:Georgia,serif;font-size:1.6rem;font-weight:800;color:var(--teal);">5</div><div style="font-size:.72rem;color:var(--ink-2);font-weight:600;">Assigned</div></div>
+        <div style="background:var(--violet-t);border-radius:12px;padding:14px;text-align:center;"><div style="font-family:Georgia,serif;font-size:1.6rem;font-weight:800;color:var(--violet);">2</div><div style="font-size:.72rem;color:var(--ink-2);font-weight:600;">Completed</div></div>
+        <div style="background:var(--amber-t);border-radius:12px;padding:14px;text-align:center;"><div style="font-family:Georgia,serif;font-size:1.6rem;font-weight:800;color:var(--amber);">7.4</div><div style="font-size:.72rem;color:var(--ink-2);font-weight:600;">Avg Score</div></div>
+        <div style="background:var(--coral-t);border-radius:12px;padding:14px;text-align:center;"><div style="font-family:Georgia,serif;font-size:1.6rem;font-weight:800;color:var(--coral);">4.2d</div><div style="font-size:.72rem;color:var(--ink-2);font-weight:600;">Avg Time</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div id="page-settings" class="page-view" style="display:none;">
+  <div class="page-header"><h1>Settings</h1></div>
+  <div class="review-form-card" style="margin-bottom:14px;">
+    <h3 style="font-family:Georgia,serif;margin-bottom:16px;">Appearance</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div><div style="font-weight:600;font-size:.88rem;">Dark Mode</div><div style="font-size:.78rem;color:var(--ink-2);">Toggle light and dark theme</div></div>
+      <button class="theme-pill" onclick="toggleTheme()"><div class="theme-pill-track"><span class="theme-sun">☀️</span><span class="theme-moon">🌙</span><div class="theme-pill-thumb">☀️</div></div></button>
+    </div>
+  </div>
+  <div class="review-form-card">
+    <h3 style="font-family:Georgia,serif;margin-bottom:16px;">Notification Preferences</h3>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+        <div><div style="font-weight:600;font-size:.88rem;">New Paper Assigned</div><div style="font-size:.78rem;color:var(--ink-2);">Get notified when admin assigns a paper</div></div>
+        <input type="checkbox" checked style="width:auto;accent-color:var(--teal);">
+      </label>
+      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+        <div><div style="font-weight:600;font-size:.88rem;">Deadline Reminders</div><div style="font-size:.78rem;color:var(--ink-2);">7 days and 1 day before deadline</div></div>
+        <input type="checkbox" checked style="width:auto;accent-color:var(--teal);">
+      </label>
+      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+        <div><div style="font-weight:600;font-size:.88rem;">Review Published</div><div style="font-size:.78rem;color:var(--ink-2);">When admin publishes your review</div></div>
+        <input type="checkbox" checked style="width:auto;accent-color:var(--teal);">
+      </label>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+/* ── Auth guard ── */
+const session = JSON.parse(localStorage.getItem("cms_session")||"null");
+if(!session || session.role !== "reviewer"){
+  window.location.href = "login.html";
+} else {
+  document.getElementById("topbar-nm").textContent = session.name.split(" ")[0];
+  document.getElementById("topbar-av").textContent  = session.name[0];
+  document.getElementById("drop-name").textContent  = session.name;
+  document.getElementById("profile-av").textContent = session.name[0];
+  document.getElementById("profile-name-h").textContent = session.name;
+  const h = new Date().getHours();
+  const g = h<12?"Good morning":h<17?"Good afternoon":"Good evening";
+  document.getElementById("greeting").textContent = `${g}, ${session.name.split(" ")[0]} 👋`;
+}
+
+async function logout(){
+  try{ await fetch('/api/logout',{method:'POST'}); }catch(e){}
+  localStorage.removeItem("cms_session"); window.location.href="login.html";
+}
+
+/* ── Theme ── */
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur==="dark"?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next);
+  localStorage.setItem("cms_theme",next);
+  updateThumb();
+  if(revChart) revChart.destroy(), revChart=null, renderReviewerChart();
+}
+function updateThumb(){
+  const d=document.documentElement.getAttribute("data-theme")==="dark";
+  document.querySelectorAll(".theme-pill-thumb").forEach(el=>el.textContent=d?"🌙":"☀️");
+}
+updateThumb();
+
+/* ── Dropdown ── */
+function toggleDrop(){ document.getElementById("profile-drop").classList.toggle("open"); }
+document.addEventListener("click",e=>{ if(!e.target.closest(".dropdown-wrap")) document.querySelectorAll(".dropdown").forEach(d=>d.classList.remove("open")); });
+
+/* ── Pages ── */
+function showPage(id){
+  document.querySelectorAll(".page-view").forEach(p=>p.style.display="none");
+  const pg = document.getElementById("page-"+id);
+  if(pg) pg.style.display="block";
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  const m = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
+  if(m) m.classList.add("active");
+  document.getElementById("profile-drop")?.classList.remove("open");
+  if(id==="overview")  setTimeout(()=>{ renderReviewerChart(); refreshReviewerDashboard(); },80);
+  if(id==="history")   setTimeout(()=>{ renderHistoryCharts(); refreshReviewerDashboard(); },80);
+  if(id==="notifications") setTimeout(fetchNotifications,80);
+  if(id==="assigned") setTimeout(refreshReviewerDashboard,80);
+}
+
+/* ── Toast ── */
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2400);
+}
+
+// small helpers
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ── Filters ── */
+function filterAssigned(f,btn){ document.querySelectorAll(".ftab").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); showToast(`Filtered: ${f}`); }
+
+async function loadAssigned(force=false){
+  try{
+    const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+    const reviewer_id = session ? session.id : null;
+    if(!reviewer_id) return;
+    console.log('loadAssigned session', session, 'reviewer_id', reviewer_id);
+    const res = await fetch(`/api/papers?reviewer_id=${reviewer_id}&_=${Date.now()}`,{credentials:'same-origin'});
+    if(!res.ok) { console.warn('papers fetch not ok', res.status); return; }
+    const rows = await res.json();
+    console.log('loadAssigned rows', rows);
+    const tbody = document.querySelector('#page-assigned table tbody');
+    if(!tbody) return;
+    tbody.innerHTML = rows.map(p=>{
+      const submitted = p.submitted_at? new Date(p.submitted_at).toLocaleDateString():'';
+      const deadline = '';
+      return `<tr><td style="font-weight:600;">${escapeHtml(p.title||'')}</td><td style="color:var(--ink-2);">${escapeHtml(p.author_name||'')}</td><td style="color:var(--ink-2);font-size:.83rem;">${escapeHtml(p.conference_name||'')}</td><td style="color:var(--ink-3);font-size:.82rem;">${submitted}</td><td style="color:var(--rose);font-weight:600;font-size:.82rem;">${deadline}</td><td><span class="badge badge-review">Pending</span></td><td><button class="action-btn ab-teal" onclick='openReviewForm(${p.id}, ${JSON.stringify(p.title||'')}, ${JSON.stringify(p.conference_name||'')}, ${JSON.stringify(p.file_path||'')})'>Review</button></td></tr>`;
+    }).join('\n');
+  }catch(e){ console.error(e); }
+}
+
+window.addEventListener('load', ()=>{ try{ loadAssigned(); refreshReviewerDashboard(); fetchNotifications(); fetchStats(); }catch(e){} });
+
+// Poll for new assignments every 10 seconds so reviewer sees new work quickly
+let _assignedPoll = null;
+function startAssignedPolling(){ if(_assignedPoll) clearInterval(_assignedPoll); _assignedPoll = setInterval(()=>{ try{ loadAssigned(); }catch(e){} }, 10000); }
+function stopAssignedPolling(){ if(_assignedPoll) clearInterval(_assignedPoll); _assignedPoll = null; }
+startAssignedPolling();
+
+// Real-time updates via Server-Sent Events (SSE) with graceful fallback to polling
+let _sse = null;
+function addNotification(message, time){
+  try{
+    const list = document.getElementById('notif-list');
+    if(!list) return;
+    const item = document.createElement('div');
+    item.style.display='flex'; item.style.gap='12px'; item.style.padding='12px 0'; item.style.borderBottom='1px solid var(--border)';
+    item.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:var(--violet);flex-shrink:0;margin-top:5px;"></div><div><div style="font-size:.85rem;color:var(--ink);">${escapeHtml(message)}</div><div style="font-size:.72rem;color:var(--ink-3);margin-top:3px;">${escapeHtml(time)}</div></div>`;
+    list.insertBefore(item, list.firstChild);
+    // update badge count
+    const badge = document.querySelector('.notif-badge');
+    const pendingBadge = document.getElementById('pending-badge');
+    if(badge) { let v = parseInt(badge.dataset.count||'0',10); v = isNaN(v)?1:(v+1); badge.dataset.count = v; badge.style.display='inline-block'; }
+    if(pendingBadge){ let n = parseInt(pendingBadge.textContent||'0',10); if(!isNaN(n)) pendingBadge.textContent = (n+1); }
+  }catch(e){ console.error('addNotification', e); }
+}
+
+function markAllNotificationsRead(){
+  document.querySelectorAll('#notif-list > div').forEach(d=>d.style.opacity=0.6);
+  const badge = document.querySelector('.notif-badge'); if(badge) { badge.dataset.count = 0; badge.style.display='none'; }
+  showToast('All notifications marked read ✅');
+}
+
+function renderPendingReviews(rows){
+  const tbody = document.getElementById('pending-reviews-body');
+  if(!tbody) return;
+  if(!rows || !rows.length){
+    tbody.innerHTML = '<tr><td colspan="4" style="padding:18px;color:var(--ink-2);text-align:center;">No pending reviews</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.slice(0,3).map(p => {
+    const deadline = p.deadline || 'Soon';
+    const dlColor = deadline.toLowerCase().includes('day') ? 'var(--rose)' : 'var(--amber)';
+    const title = escapeHtml(p.title || 'Untitled paper');
+    const conf = escapeHtml(p.conference_name || 'Conference');
+    const filePath = p.file_path || '';
+    return `<tr>
+      <td style="font-weight:600;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</td>
+      <td style="color:var(--ink-2);font-size:.82rem;">${conf}</td>
+      <td style="color:${dlColor};font-size:.82rem;font-weight:600;">${escapeHtml(deadline)}</td>
+      <td><button class="action-btn ab-teal" onclick='openReviewForm(${p.id}, ${JSON.stringify(p.title||'')}, ${JSON.stringify(p.conference_name||'')}, ${JSON.stringify(filePath)})'>Review</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderReviewHistory(rows){
+  const host = document.getElementById('review-history-list');
+  if(!host) return;
+  if(!rows || !rows.length){
+    host.innerHTML = '<div class="history-item"><div class="history-info"><div class="history-title">No review history yet</div><div class="history-sub">Once you submit a review, it will appear here.</div></div></div>';
+    return;
+  }
+  host.innerHTML = rows.map(r => {
+    const title = escapeHtml(r.paper_title || r.title || 'Paper');
+    const conf = escapeHtml(r.conference_name || 'Conference');
+    const date = r.reviewed_at ? new Date(r.reviewed_at).toLocaleDateString() : 'Recently';
+    const score = r.score ?? '—';
+    return `<div class="history-item">
+      <div class="history-icon" style="background:var(--teal-t);">📄</div>
+      <div class="history-info">
+        <div class="history-title">${title}</div>
+        <div class="history-sub">${conf} · ${escapeHtml(r.decision || 'Reviewed')} · ${escapeHtml(date)}</div>
+      </div>
+      <div class="history-score" style="color:var(--teal);">${score}/10</div>
+    </div>`;
+  }).join('');
+}
+
+async function fetchNotifications(){
+  try{
+    const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+    const userId = session ? session.id : null; if(!userId) return;
+    const res = await fetch(`/api/notifications?user_id=${userId}&_=${Date.now()}`,{credentials:'same-origin'});
+    if(!res.ok) return;
+    const list = document.getElementById('notif-list');
+    if(!list) return;
+    const rows = await res.json();
+    if(!rows || !rows.length){
+      list.innerHTML = '<div style="padding:12px 0;color:var(--ink-2);">No notifications yet.</div>';
+      return;
+    }
+    list.innerHTML = rows.slice(0,8).map(n => {
+      const isUnread = Number(n.is_read) === 0;
+      const dotColor = isUnread ? 'var(--violet)' : 'var(--border)';
+      const textColor = isUnread ? 'var(--ink)' : 'var(--ink-2)';
+      const date = n.created_at ? new Date(n.created_at).toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : 'Recently';
+      return `<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">
+        <div style="width:8px;height:8px;border-radius:50%;background:${dotColor};flex-shrink:0;margin-top:5px;"></div>
+        <div><div style="font-size:.85rem;color:${textColor};">${escapeHtml(String(n.message || 'Notification'))}</div><div style="font-size:.72rem;color:var(--ink-3);margin-top:3px;">${escapeHtml(date)}</div></div>
+      </div>`;
+    }).join('');
+  }catch(e){ console.warn('fetchNotifications', e); }
+}
+
+async function refreshReviewerDashboard(){
+  try{
+    const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+    const reviewer_id = session ? session.id : null; if(!reviewer_id) return;
+    const [papersRes, reviewsRes] = await Promise.all([
+      fetch(`/api/papers?reviewer_id=${reviewer_id}&_=${Date.now()}`,{credentials:'same-origin'}),
+      fetch(`/api/reviews?reviewer_id=${reviewer_id}&_=${Date.now()}`,{credentials:'same-origin'})
+    ]);
+    const papers = papersRes.ok ? await papersRes.json() : [];
+    const reviews = reviewsRes.ok ? await reviewsRes.json() : [];
+    const reviewedIds = new Set(reviews.map(r => Number(r.paper_id)));
+    const pending = papers.filter(p => !reviewedIds.has(Number(p.id)));
+    renderPendingReviews(pending);
+    if(document.getElementById('s-pending')) document.getElementById('s-pending').textContent = String(pending.length);
+    if(document.getElementById('pending-badge')) document.getElementById('pending-badge').textContent = String(pending.length);
+    renderReviewHistory(reviews);
+    if(document.getElementById('s-done')) document.getElementById('s-done').textContent = String(reviews.length);
+    fetchNotifications();
+  }catch(e){ console.warn('refreshReviewerDashboard', e); }
+}
+
+async function fetchStats(){
+  try{
+    const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+    const reviewer_id = session ? session.id : null; if(!reviewer_id) return;
+    const res = await fetch(`/api/reviewer_stats?reviewer_id=${reviewer_id}&_=${Date.now()}`,{credentials:'same-origin'});
+    if(!res.ok) return;
+    const js = await res.json(); updateStatsUI(js);
+  }catch(e){ console.warn('fetchStats', e); }
+}
+
+function updateStatsUI(data){
+  try{
+    if(!data) return;
+    if(typeof data.assigned!=='undefined') document.getElementById('s-assigned').textContent = data.assigned;
+    if(typeof data.pending!=='undefined') document.getElementById('s-pending').textContent = data.pending;
+    if(typeof data.done!=='undefined') document.getElementById('s-done').textContent = data.done;
+    if(typeof data.overall_percent!=='undefined'){
+      document.getElementById('stat-overall-percent').textContent = data.overall_percent+"%";
+      document.getElementById('progress-overall-fill').style.width = (Math.max(0,Math.min(100,data.overall_percent))) + '%';
+    }
+    if(typeof data.month_percent!=='undefined'){
+      document.getElementById('stat-month-percent').textContent = data.month_percent+"%";
+      document.getElementById('progress-month-fill').style.width = (Math.max(0,Math.min(100,data.month_percent))) + '%';
+    }
+    if(typeof data.response_days!=='undefined'){
+      document.getElementById('stat-response-text').textContent = data.response_days + ' days';
+      const pct = Math.max(0, Math.min(100, 100 - (data.response_days*5))); // simple transform to bar
+      document.getElementById('progress-response-fill').style.width = pct + '%';
+    }
+    if(data.urgent){
+      document.getElementById('urgent-text').innerHTML = escapeHtml(data.urgent.message || '') + ' <strong id="urgent-days" style="color:var(--rose);">' + escapeHtml(data.urgent.when||'') + '</strong>';
+      document.getElementById('urgent-note').style.display = 'block';
+    } else {
+      // hide if none
+      if(document.getElementById('urgent-note')) document.getElementById('urgent-note').style.display = 'none';
+    }
+  }catch(e){ console.error('updateStatsUI', e); }
+}
+
+function startRealtime(){
+  try{
+    const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+    const reviewer_id = session ? session.id : null; if(!reviewer_id) return;
+    if(typeof(EventSource) === 'undefined') { console.warn('SSE not supported, relying on polling'); return; }
+    if(_sse) { try{ _sse.close(); }catch(e){} }
+    _sse = new EventSource(`/api/stream?reviewer_id=${reviewer_id}`);
+    _sse.addEventListener('assigned', e=>{ try{ const d=JSON.parse(e.data); addNotification(`New paper "${d.title}" assigned to you.`, 'Just now'); loadAssigned(); refreshReviewerDashboard(); fetchStats(); }catch(er){console.error(er);} });
+    _sse.addEventListener('review_submitted', e=>{ try{ const d=JSON.parse(e.data); addNotification(`Review for "${d.title}" submitted.`, 'Just now'); loadAssigned(); refreshReviewerDashboard(); fetchStats(); fetchNotifications(); if(document.getElementById('page-history').style.display==='block') renderHistoryCharts(); }catch(er){console.error(er);} });
+    _sse.addEventListener('notification', e=>{ try{ const d=JSON.parse(e.data); const msg = d.message || 'New notification'; addNotification(msg, 'Just now'); fetchNotifications(); }catch(er){console.error(er);} });
+    _sse.addEventListener('stats', e=>{ try{ const d=JSON.parse(e.data); updateStatsUI(d); }catch(er){console.error(er);} });
+    _sse.onerror = function(){ console.warn('SSE connection error'); try{ _sse.close(); }catch(e){} _sse=null; };
+  }catch(e){ console.error('startRealtime', e); }
+}
+
+// start realtime and also kick off stats fetch on load
+startRealtime();
+fetchStats();
+
+/* ── Review form ── */
+function openReviewForm(paper, conf){
+  let paperId = null;
+  let title = paper;
+  let confName = conf;
+  let filePath = '';
+  // backward compatible: if third arg provided, shift args (id, title, conf)
+  if(arguments.length>=3){ paperId = paper; title = conf; confName = arguments[2]; }
+  if(arguments.length>=4){ filePath = arguments[3] || ''; }
+  document.getElementById("review-paper-id").value = paperId||'';
+  document.getElementById("review-paper-title").textContent = title;
+  document.getElementById("review-conf").textContent        = conf;
+  document.getElementById("breadcrumb-paper").textContent   = paper;
+  const dl = document.getElementById('download-link');
+  if(dl){ if(filePath){ dl.href = filePath; dl.style.display='inline-flex'; } else { dl.href='#'; dl.style.display='none'; } }
+  document.getElementById("score-val").value     = "";
+  document.getElementById("decision-val").value  = "";
+  document.getElementById("review-comment").value = "";
+  document.getElementById("score-hint").textContent = "Click a dot to select your score";
+  document.querySelectorAll(".sdot").forEach(d=>d.classList.remove("active"));
+  document.getElementById("btn-accept").className = "decision-btn";
+  document.getElementById("btn-reject").className = "decision-btn";
+  showPage("review-form");
+  buildScoreDots();
+}
+
+/* ── Score dots ── */
+const scoreHints = ["","Very Poor","Poor","Below Average","Average","Fair","Good","Very Good","Excellent","Outstanding","Perfect ✨"];
+function buildScoreDots(){
+  const wrap = document.getElementById("score-dots");
+  wrap.innerHTML="";
+  for(let i=1;i<=10;i++){
+    const d = document.createElement("div");
+    d.className="sdot"; d.textContent=i; d.title=scoreHints[i];
+    d.onclick=()=>{
+      document.querySelectorAll(".sdot").forEach(x=>x.classList.remove("active"));
+      d.classList.add("active");
+      document.getElementById("score-val").value=i;
+      document.getElementById("score-hint").textContent=`${i}/10 — ${scoreHints[i]}`;
+    };
+    wrap.appendChild(d);
+  }
+}
+buildScoreDots();
+
+/* ── Decision ── */
+function setDecision(val){
+  document.getElementById("decision-val").value = val;
+  const a = document.getElementById("btn-accept");
+  const r = document.getElementById("btn-reject");
+  a.className = "decision-btn" + (val==="Accept"?" accept-active":"");
+  r.className = "decision-btn" + (val==="Reject"?" reject-active":"");
+}
+
+/* ── Submit review ── */
+function submitReview(){
+  const score    = document.getElementById("score-val").value;
+  const decision = document.getElementById("decision-val").value;
+  if(!score)    { showToast("⚠️ Please select a score"); return; }
+  if(!decision) { showToast("⚠️ Please select Accept or Reject"); return; }
+  const paperId = document.getElementById('review-paper-id').value || null;
+  const comment = document.getElementById('review-comment').value || '';
+  const criteria = Array.from(document.querySelectorAll('.review-form-card input[type=checkbox]')).map((cb,i)=>cb.checked?`c${i+1}`:'').filter(Boolean).join(',');
+  const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+  const reviewer_id = session ? session.id : null;
+  if(!reviewer_id){ showToast('Not logged in'); return; }
+  // call API
+  fetch('/api/reviews',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({paper_id:paperId,reviewer_id,score:parseInt(score,10),decision,comments:comment,criteria})})
+    .then(r=>{ if(!r.ok) throw new Error('submit failed'); return r.json(); })
+    .then(j=>{
+      showToast('Review submitted successfully ✅');
+      // redirect back and refresh
+      setTimeout(()=>{ showPage('assigned'); try{ if(typeof loadAssigned==='function') loadAssigned(); }catch(e){} },900);
+    }).catch(e=>{ console.error(e); showToast('Submit failed'); });
+}
+
+/* ── Profile save ── */
+function saveProfile(){
+  const n=document.getElementById("p-name").value;
+  session.name=n; localStorage.setItem("cms_session",JSON.stringify(session));
+  document.getElementById("topbar-nm").textContent=n.split(" ")[0];
+  document.getElementById("topbar-av").textContent=n[0];
+  document.getElementById("drop-name").textContent=n;
+  document.getElementById("profile-av").textContent=n[0];
+  document.getElementById("profile-name-h").textContent=n;
+  showToast("Profile saved ✅");
+}
+
+/* ── Charts ── */
+let revChart=null;
+function renderReviewerChart(){
+  const canvas=document.getElementById("reviewerChart"); if(!canvas) return;
+  if(revChart){revChart.destroy();revChart=null;}
+  const isDark=document.documentElement.getAttribute("data-theme")==="dark";
+  const gc=isDark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)";
+  const tc=isDark?"#9d96c8":"#5b5484";
+  revChart=new Chart(canvas.getContext("2d"),{
+    type:"line",
+    data:{labels:["Jan","Feb","Mar","Apr","May","Jun","Jul"],
+      datasets:[{label:"Reviews Completed",data:[0,1,0,1,2,1,2],fill:true,borderColor:"#00c896",backgroundColor:"rgba(0,200,150,.1)",tension:.45,pointBackgroundColor:"#00c896",pointRadius:5,pointHoverRadius:7}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{backgroundColor:"#1a1040",padding:10,cornerRadius:10}},scales:{x:{grid:{color:gc},ticks:{color:tc}},y:{grid:{color:gc},ticks:{color:tc,stepSize:1},beginAtZero:true,max:4}}}
+  });
+}
+
+function switchRevChart(type,btn){
+  document.querySelectorAll(".ftab").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
+  if(!revChart) return;
+  if(type==="reviews"){
+    revChart.data.datasets[0].data=[0,1,0,1,2,1,2];
+    revChart.data.datasets[0].borderColor="#00c896";
+    revChart.data.datasets[0].backgroundColor="rgba(0,200,150,.1)";
+    revChart.data.datasets[0].pointBackgroundColor="#00c896";
+    revChart.data.datasets[0].label="Reviews Completed";
+  } else {
+    revChart.data.datasets[0].data=[0,8,0,7,8,7,9];
+    revChart.data.datasets[0].borderColor="#5b3df6";
+    revChart.data.datasets[0].backgroundColor="rgba(91,61,246,.1)";
+    revChart.data.datasets[0].pointBackgroundColor="#5b3df6";
+    revChart.data.datasets[0].label="Avg Score";
+  }
+  revChart.update();
+}
+
+let hChart=null,sChart=null;
+function renderHistoryCharts(){
+  const isDark=document.documentElement.getAttribute("data-theme")==="dark";
+  const gc=isDark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)";
+  const tc=isDark?"#9d96c8":"#5b5484";
+  if(hChart){hChart.destroy();hChart=null;}
+  hChart=new Chart(document.getElementById("historyChart").getContext("2d"),{
+    type:"bar",
+    data:{labels:["Jan","Feb","Mar","Apr","May","Jun"],datasets:[{label:"Reviews",data:[0,1,0,1,2,1],backgroundColor:"rgba(0,200,150,.7)",borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{color:tc}},y:{grid:{color:gc},ticks:{color:tc,stepSize:1},beginAtZero:true}}}
+  });
+  if(sChart){sChart.destroy();sChart=null;}
+  sChart=new Chart(document.getElementById("scoreChart").getContext("2d"),{
+    type:"doughnut",
+    data:{labels:["Score 8","Score 9"],datasets:[{data:[1,1],backgroundColor:["rgba(0,200,150,.8)","rgba(91,61,246,.8)"],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc,font:{size:11}},position:"bottom"}}}
+  });
+}
+
+window.addEventListener("load",()=>{ renderReviewerChart(); });
+</script>
+</body>
+</html>

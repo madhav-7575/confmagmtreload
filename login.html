@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS — Login</title>
+<script>(function(){const t=localStorage.getItem("cms_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
+<style>
+/* ── TOKENS ── */
+:root{
+--navy:#041e56;
+--navy-2:#0b2c73;
+--navy-3:#0d448b;
+--sky:#1aa3ff;
+--sky-2:#3db0ff;
+--sky-soft:#8ad5ff;
+--blue:#0d7be8;
+--blue-2:#0b5ac7;
+--text:#f5f8ff;
+--muted:#cfe0ff;
+--line:rgba(255,255,255,.22);
+--card:rgba(255,255,255,.08);
+--card-2:rgba(255,255,255,.12);
+--shadow:rgba(4, 16, 42, 0.28);
+--input:#ffffff;
+--button:#1d85eb;
+--button-2:#0f69d6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+font-family:"Segoe UI",system-ui,sans-serif;
+background:var(--navy);
+color:var(--text);
+min-height:100vh;
+display:flex;
+flex-direction:column;
+-webkit-font-smoothing:antialiased;
+}
+body::before{display:none;}
+
+/* ── TOP BAR ── */
+.topbar{
+height:56px;background:transparent;border:none;display:flex;align-items:center;
+padding:0 28px;position:sticky;top:0;z-index:100;
+}
+.topbar-brand{display:flex;align-items:center;gap:10px;font-family:Georgia,serif;font-weight:700;font-size:1.1rem;color:var(--text);}
+.topbar-gem{width:28px;height:28px;background:linear-gradient(135deg,#89d9ff,#4bb7ff);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:#0f2a66;box-shadow:0 8px 20px rgba(29,133,235,.25);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.theme-pill{display:flex;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:3px;cursor:pointer;backdrop-filter:blur(6px);}
+.theme-pill-track{width:44px;height:22px;position:relative;}
+.theme-pill-thumb{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:0;left:0;box-shadow:0 2px 8px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;font-size:.72rem;}
+/* Guide button beside theme pill */
+.guide-btn{margin-left:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--text);cursor:pointer;font-weight:700;display:flex;align-items:center;gap:8px;font-size:0.95rem}
+.guide-btn:hover{background:rgba(255,255,255,.10);}
+
+/* ── LAYOUT ── */
+.auth-shell{flex:1;display:flex;min-height:calc(100vh - 56px);background:var(--navy);}
+.auth-left{
+width:52%;
+min-height:100%;
+display:flex;
+align-items:flex-start;
+justify-content:center;
+padding:80px 60px 60px 80px;
+position:relative;
+overflow:hidden;
+}
+.auth-left-panel{
+width:100%;
+max-width:620px;
+position:relative;
+z-index:2;
+}
+.auth-bubble{
+width:92px;height:92px;border-radius:50%;
+background:linear-gradient(135deg,#91d9cc,#5ab5a2);
+box-shadow:inset 0 -12px 20px rgba(0,0,0,.08),0 12px 18px rgba(0,0,0,.12);
+display:flex;align-items:center;justify-content:center;
+font-size:2.4rem; margin:0 0 26px 0;
+}
+.auth-bubble::before{
+content:"";display:block;width:28px;height:28px;border-radius:50%;background:#f5d7ae;position:absolute;transform:translate(-10px,-18px);box-shadow:0 0 0 10px rgba(255,255,255,.18);
+}
+.auth-title{
+font-family:"Segoe Print","Bradley Hand",cursive;
+font-size:clamp(3rem,4.3vw,5.5rem);
+line-height:1;
+font-weight:700;
+margin:0 0 26px 0;
+letter-spacing:-.05em;
+color:#fff;
+}
+.auth-form-block{display:flex;flex-direction:column;gap:18px;}
+.form-floating{display:flex;flex-direction:column;gap:8px;}
+.form-floating label{
+font-size:1.1rem;
+font-weight:700;
+color:#f7fbff;
+letter-spacing:-.02em;
+}
+.form-floating input{
+width:100%;
+background:transparent;
+border:none;
+border-bottom:2px solid rgba(255,255,255,.8);
+color:#fff;
+font-size:1.05rem;
+padding:10px 2px 12px;
+outline:none;
+transition:border-color .2s, box-shadow .2s;
+}
+.form-floating input::placeholder{color:rgba(255,255,255,.5);}
+.form-floating input:focus{
+border-bottom-color:#7de2ff;
+box-shadow:0 2px 0 0 rgba(125,226,255,.35);
+}
+.submit-btn{
+margin-top:22px;
+width:100%;
+height:74px;
+border:none;
+border-radius:18px;
+font-size:clamp(1.6rem,2.2vw,2.5rem);
+font-family:"Segoe Print","Bradley Hand",cursive;
+font-weight:700;
+background:linear-gradient(180deg,var(--button),var(--button-2));
+color:#fff;
+cursor:pointer;
+box-shadow:0 12px 22px rgba(13,123,232,.28);
+transition:transform .2s, box-shadow .2s, filter .2s;
+}
+.submit-btn:hover{transform:translateY(-2px); box-shadow:0 18px 26px rgba(13,123,232,.32); filter:brightness(1.03);}
+.submit-btn:active{transform:translateY(0);}
+.auth-login-link{
+text-align:center;
+padding-top:12px;
+font-size:1.05rem;
+color:rgba(255,255,255,.9);
+font-weight:600;
+}
+.auth-login-link a{color:#fff;text-decoration:none;font-weight:700;}
+.auth-login-link a:hover{text-decoration:underline;}
+
+.auth-right{
+flex:1;
+position:relative;
+overflow:hidden;
+background:linear-gradient(180deg,#0a3a85 0%,#0a82d7 100%);
+}
+.auth-right::before{
+content:"";
+position:absolute;
+inset:40% -12% -14% -12%;
+background:linear-gradient(180deg,#1ca7ff,#0f83e8);
+border-radius:42% 58% 0 0 / 35% 52% 0 0;
+transform:rotate(6deg);
+box-shadow:inset 0 18px 28px rgba(255,255,255,.08);
+}
+.auth-right::after{
+content:"";
+position:absolute;
+width:680px;height:680px;border-radius:50%;
+background:rgba(11,86,179,.12);
+right:-130px;bottom:-220px;
+}
+.scene-title{
+position:absolute;
+left:36px;
+top:28px;
+z-index:20;
+font-size:1.9rem;
+font-weight:900;
+letter-spacing:.06em;
+text-transform:none;
+color:rgba(255,255,255,0.98);
+text-shadow:0 10px 30px rgba(3,18,48,.38);
+}
+.scene-title span{
+display:block;
+font-size:0.84rem;
+opacity:.95;
+margin-top:6px;
+color:rgba(255,255,255,.85);
+}
+.lamp-wrap{position:absolute;top:38px;right:260px;width:320px;height:320px;display:flex;align-items:flex-start;justify-content:center;z-index:9;pointer-events:none}
+.lamp-shade{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:160px;height:110px;background:linear-gradient(180deg,#ffd78a,#ffdfb3);border-radius:50% 50% 36% 36% / 75% 75% 28% 28%;
+  box-shadow:inset 0 -8px 16px rgba(0,0,0,.08),0 12px 24px rgba(255,200,90,.06);z-index:12;
+}
+.lamp-shade::after{
+  content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:-26px;width:110px;height:36px;border-radius:0 0 28px 28px;background:rgba(255,255,255,.06);
+}
+.lamp-pole{position:absolute;top:118px;width:6px;height:180px;background:linear-gradient(180deg,#dfe4f0,#b3bfd8);border-radius:999px;z-index:11}
+.lamp-light{position:absolute;top:110px;left:50%;transform:translateX(-50%);width:420px;height:420px;border-radius:50%;background:radial-gradient(circle at 50% 20%, rgba(255,240,200,0.98) 0%, rgba(255,230,140,0.9) 10%, rgba(255,200,90,0.45) 25%, rgba(255,200,90,0.18) 40%, transparent 70%);filter:blur(18px);box-shadow:0 0 120px rgba(255,200,90,.55);z-index:10;pointer-events:none}
+
+.figure{
+  position:absolute;
+  right:20px;
+  bottom:-110px;
+  width:520px;
+  height:520px;
+  z-index:6;
+  transform:translateZ(0);
+  display:flex;align-items:center;justify-content:center;
+}
+.figure{position:relative;isolation:isolate}
+.figure img{width:92%;height:auto;object-fit:contain;border-radius:8px;box-shadow:0 42px 88px rgba(6,36,92,.44);display:block;transform:translate(30px,190px);}
+
+/* soft colored blob behind the image to blend into the panel */
+.figure::before{content:"";position:absolute;inset:6% 2% 6% 2%;z-index:-1;border-radius:18%/30%;background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), rgba(29,133,235,0.06) 18%, rgba(11,86,179,0.04) 50%);transform:translateY(6%);filter:blur(26px);}
+/* subtle overlay to tint and unify colors */
+.figure::after{content:"";position:absolute;inset:0 6% 10% 6%;z-index:1;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));pointer-events:none;}
+.figure .chair{
+position:absolute;left:92px;bottom:12px;width:240px;height:100px;border-radius:18px 18px 30px 30px;background:linear-gradient(180deg,#5d6b8a,#3a4d68);box-shadow:inset 0 8px 14px rgba(255,255,255,.12),0 20px 30px rgba(18,34,63,.2);
+}
+.figure .chair::before,
+.figure .chair::after{
+content:"";position:absolute;bottom:0;width:18px;height:120px;border-radius:10px;background:#45627e;
+}
+.figure .chair::before{left:24px;} .figure .chair::after{right:24px;}
+.figure .head{position:absolute;left:180px;top:36px;width:132px;height:132px;border-radius:50%;background:#f4d8b7;box-shadow:inset 0 -12px 16px rgba(0,0,0,.08);}
+.figure .hair{position:absolute;left:176px;top:18px;width:144px;height:96px;border-radius:60% 60% 42% 42%;background:#6f4e3d;}
+.figure .head::before{content:"";position:absolute;left:50px;top:46px;width:12px;height:12px;border-radius:50%;background:#1c1d1f;box-shadow:40px 0 0 #1c1d1f;}
+.figure .head::after{content:"";position:absolute;left:58px;top:84px;width:34px;height:16px;border-radius:0 0 22px 22px;border-bottom:5px solid rgba(0,0,0,.38);}
+.figure .body{position:absolute;left:110px;top:160px;width:260px;height:140px;background:linear-gradient(180deg,#f8f8f8,#e8e8e8);border-radius:30px 30px 24px 24px;box-shadow:0 20px 28px rgba(18,34,63,.18);} 
+.figure .arm{position:absolute;top:190px;width:44px;height:156px;background:#f6d9b7;border-radius:26px;}
+.figure .arm.left{left:92px;transform:rotate(28deg);}
+.figure .arm.right{right:102px;transform:rotate(-18deg);}
+.figure .hand{position:absolute;top:306px;width:46px;height:56px;border-radius:22px;background:#f4d8b7;}
+.figure .hand.left{left:112px;}
+.figure .hand.right{right:94px;}
+.figure .phone{display:none;}
+.figure .paper{
+position:absolute;left:148px;top:198px;width:132px;height:168px;background:linear-gradient(180deg,#ffffff,#f2f8ff);border-radius:8px;border:2px solid rgba(17,96,180,.14);transform:rotate(-12deg);box-shadow:0 20px 36px rgba(6,36,92,.22);border-left:4px solid rgba(17,96,180,.06);
+}
+.figure .paper::before{content:"";position:absolute;left:14px;right:14px;top:22px;height:3px;background:rgba(25,86,169,.22);box-shadow:0 16px 0 rgba(25,86,169,.18),0 36px 0 rgba(25,86,169,.12);} 
+.figure .legs{position:absolute;left:140px;top:300px;width:200px;height:140px;}
+.figure .leg{position:absolute;bottom:0;width:72px;height:118px;background:linear-gradient(180deg,#a4d7c9,#6db8a7);border-radius:28px 28px 22px 22px;}
+.figure .leg.left{left:34px;transform:rotate(14deg);}
+.figure .leg.right{right:34px;transform:rotate(-14deg);}
+.figure .shoe{position:absolute;bottom:-8px;width:92px;height:38px;background:#232b38;border-radius:20px 18px 18px 24px;}
+.figure .shoe.left{left:16px;}
+.figure .shoe.right{right:16px;}
+.figure .torso-shadow{position:absolute;left:108px;top:300px;width:260px;height:170px;border-radius:40% 40% 30% 30%;background:linear-gradient(180deg,rgba(20,40,76,.08),rgba(20,40,76,.02));filter:blur(18px);}
+
+@media (max-width: 980px){
+.auth-shell{flex-direction:column;}
+.auth-left{width:100%;padding:42px 24px 20px;}
+.auth-right{min-height:420px;}
+.auth-title{font-size:3.4rem;}
+.lamp-wrap{right:160px;transform:scale(.92);} 
+.figure{right:40px;bottom:-40px;transform:translateY(60px) scale(.78);transform-origin:bottom right;}
+.scene-title{left:24px;top:18px;font-size:1.5rem;}
+}
+@media (max-width: 560px){
+.topbar{padding:0 18px;}
+.auth-left{padding:28px 18px 18px;}
+.auth-title{font-size:2.8rem;}
+.submit-btn{height:62px;font-size:1.7rem;}
+.auth-right{min-height:300px;}
+.lamp-wrap{right:120px;top:10px;transform:scale(.72);} 
+.figure{right:20px;bottom:-20px;transform:translateY(40px) scale(.62);}
+.scene-title{font-size:1.15rem;left:18px;top:8px;}
+}
+
+@media (max-width: 980px){
+.auth-shell{flex-direction:column;}
+.auth-left{width:100%;padding:42px 24px 20px;}
+.auth-right{min-height:380px;}
+.auth-title{font-size:3.4rem;}
+.lamp-wrap{right:200px;transform:scale(.9);} 
+.figure{transform:scale(.78);transform-origin:bottom right;right:0;}
+}
+@media (max-width: 560px){
+.topbar{padding:0 18px;}
+.auth-left{padding:28px 18px 18px;}
+.auth-title{font-size:2.8rem;}
+.submit-btn{height:62px;font-size:1.7rem;}
+.auth-right{min-height:300px;}
+.lamp-wrap{right:120px;top:10px;transform:scale(.72);} 
+.figure{transform:scale(.62);right:-46px;bottom:-30px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Page scripts (login/register handlers) -->
+<script>
+/* ── LOGIN (server-backed) ── */
+async function handleLogin(){
+  hideAlert();
+  const email    = document.getElementById("login-email").value.trim().toLowerCase();
+  const password = document.getElementById("login-password").value;
+  const btn      = document.getElementById("login-btn");
+  if(!email||!password){ showAlert("Please fill in all fields."); return; }
+  btn.textContent = "Signing in…"; btn.disabled = true;
+  try{
+    const data = await apiPost('/api/login',{email,password});
+    if(data && data.user){ setSession(data.user, data.token); showAlert(`✓ Welcome back, ${data.user.name.split(' ')[0]}! Redirecting…`,'success');
+      setTimeout(()=> window.location.href = `${data.user.role}_dashboard.html`, 700);
+    } else {
+      showAlert('Login failed: unexpected response'); btn.textContent = 'Sign In →'; btn.disabled = false;
+    }
+  }catch(err){
+    const msg = err && err.body && err.body.error ? err.body.error : 'Login failed';
+    showAlert(msg); btn.textContent = 'Sign In →'; btn.disabled = false;
+  }
+}
+
+/* ── REGISTER (server-backed) ── */
+async function handleRegister(){
+  hideAlert();
+  const name    = document.getElementById("reg-name").value.trim();
+  const email   = document.getElementById("reg-email").value.trim().toLowerCase();
+  const password= document.getElementById("reg-password").value;
+  const college = document.getElementById("reg-college").value.trim();
+  const role    = document.querySelector('input[name="role"]:checked')?.value || "author";
+  const btn     = document.getElementById("reg-btn");
+  if(!name||!email||!password){ showAlert("Please fill in all required fields."); return; }
+  if(password.length < 6)     { showAlert("Password must be at least 6 characters."); return; }
+  if(!email.includes("@"))    { showAlert("Please enter a valid email address."); return; }
+  btn.textContent = "Creating account…"; btn.disabled = true;
+  try{
+    const data = await apiPost('/api/register',{name,email,password,role,college});
+    if(data && data.user){
+      // auto-login the newly registered user (server sets session cookie)
+      setSession(data.user, data.token);
+      showAlert(`Account created — Welcome ${data.user.name.split(' ')[0]}! Redirecting…`,'success');
+      setTimeout(()=>{ window.location.href = `${data.user.role}_dashboard.html`; }, 700);
+    } else {
+      showAlert('Registration failed: unexpected response'); btn.textContent = 'Create Account →'; btn.disabled = false;
+    }
+  }catch(err){
+    const msg = err && err.body && err.body.error ? err.body.error : 'Registration failed';
+    showAlert(msg); btn.textContent = 'Create Account →'; btn.disabled = false;
+  }
+}
+
+// Enter key support (login/register)
+document.addEventListener("keydown", e=>{
+  if(e.key==="Enter"){
+    const loginVisible = document.getElementById("login-form").style.display!=="none";
+    if(loginVisible) handleLogin(); else handleRegister();
+  }
+});
+ </script>
+
+  <!-- Main layout -->
+  <header class="topbar">
+    <div class="topbar-brand">CMS <span class="topbar-gem">✦</span></div>
+    <div class="topbar-right">
+      <button class="guide-btn" onclick="openGuide()" aria-label="Guide">❔ Guide</button>
+      <div class="theme-pill" onclick="toggleTheme()"><div class="theme-pill-track"><div id="thumb-icon" class="theme-pill-thumb">☀️</div></div></div>
+    </div>
+  </header>
+
+  <div class="auth-shell">
+    <div class="auth-left">
+      <div class="auth-left-panel">
+        <div class="auth-bubble">👤</div>
+        <h1 class="auth-title" id="auth-title">Login</h1>
+
+        <div id="alert-box" class="alert"></div>
+
+        <div id="login-form" class="auth-form-block">
+          <div class="form-floating">
+            <label for="login-email">Username</label>
+            <input type="email" id="login-email" placeholder="you@example.com">
+          </div>
+
+          <div class="form-floating">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="••••••••">
+          </div>
+
+          <button class="submit-btn" id="login-btn" onclick="handleLogin()">Login</button>
+
+          <div class="auth-login-link" id="auth-login-link">Click here <a href="#" onclick="switchTab('register')">Register</a></div>
+        </div>
+
+        <div id="register-form" class="auth-form-block" style="display:none;">
+          <div class="form-floating">
+            <label for="reg-name">Username</label>
+            <input type="text" id="reg-name" placeholder="Dr. Jane Smith">
+          </div>
+
+          <div class="form-floating">
+            <label for="reg-email">Email</label>
+            <input type="email" id="reg-email" placeholder="you@example.com">
+          </div>
+
+          <div class="form-floating">
+            <label for="reg-password">Password</label>
+            <input type="password" id="reg-password" placeholder="Minimum 6 characters" oninput="checkStrength(this.value)">
+          </div>
+
+          <div class="form-group" style="margin-top:-8px;">
+            <label style="display:block;margin-bottom:8px;font-size:1rem;font-weight:700;color:#f7fbff;">I am registering as</label>
+            <div class="role-tabs">
+              <label class="role-tab active" onclick="selectRole('author',this)"><input type="radio" name="role" value="author" checked><div class="role-tab-icon">✍️</div><div class="role-tab-label">Author</div></label>
+              <label class="role-tab" onclick="selectRole('reviewer',this)"><input type="radio" name="role" value="reviewer"><div class="role-tab-icon">🔍</div><div class="role-tab-label">Reviewer</div></label>
+              <label class="role-tab" onclick="selectRole('admin',this)"><input type="radio" name="role" value="admin"><div class="role-tab-icon">⚙️</div><div class="role-tab-label">Admin</div></label>
+            </div>
+            <div class="role-desc" id="role-desc">✍️ Submit research papers to conferences and track acceptance status.</div>
+          </div>
+
+          <div class="form-floating">
+            <label for="reg-college">College / Organization</label>
+            <input type="text" id="reg-college" placeholder="e.g. IIT Madras, Infosys Ltd.">
+          </div>
+
+          <div class="pwd-strength"><div class="pwd-bar" id="pb1"></div><div class="pwd-bar" id="pb2"></div><div class="pwd-bar" id="pb3"></div></div>
+          <div class="pwd-label" id="pwd-label"></div>
+
+          <button class="submit-btn" id="reg-btn" onclick="handleRegister()">Registration</button>
+          <div class="auth-login-link">Click here <a href="#" onclick="switchTab('login')">Login</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-right">
+      <div class="scene-title">Conference Management System<span>Research • Reviews • Certificates</span></div>
+      <div class="lamp-wrap">
+        <div class="lamp-shade"></div>
+        <div class="lamp-pole"></div>
+        <div class="lamp-light"></div>
+      </div>
+      <div class="figure" aria-hidden="true">
+        <img id="auth-illustration" src="static/img/auth-man.png" alt="Man holding conference paper"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Guide modal -->
+  <div id="guide-modal" class="guide-modal" aria-hidden="true">
+    <div class="guide-backdrop" onclick="closeGuide()" tabindex="-1"></div>
+    <div class="guide-panel" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+      <header class="guide-header">
+        <h2 id="guide-title"><span id="guide-title-text">Getting Started Guide</span></h2>
+        <button class="guide-close" onclick="closeGuide()" aria-label="Close guide">✕</button>
+      </header>
+      <main class="guide-body" id="guide-body" tabindex="0">
+        <!-- Steps rendered by JS -->
+      </main>
+      <footer class="guide-footer">
+        <button id="guide-prev" class="guide-nav" onclick="prevGuide()">← Prev</button>
+        <div class="guide-progress" id="guide-progress"></div>
+        <button id="guide-next" class="guide-nav" onclick="nextGuide()">Next →</button>
+      </footer>
+    </div>
+    <style>
+    /* Guide modal styles */
+    .guide-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:flex-start;padding-top:72px;z-index:1200}
+    .guide-modal.open{display:flex}
+    .guide-backdrop{position:fixed;inset:0;background:rgba(3,18,48,0.55);backdrop-filter:blur(4px)}
+    .guide-panel{position:relative;margin-left:auto;width:420px;max-width:94%;right:40px;background:linear-gradient(180deg,#fff,#f6f9ff);color:#0b2a4a;border-radius:12px;box-shadow:0 24px 48px rgba(6,36,92,.32);overflow:hidden;z-index:1201}
+    .guide-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(10,30,60,.06)}
+    .guide-header h2{font-size:1.1rem;margin:0;color:#07203a}
+    .guide-close{background:transparent;border:none;font-size:1.05rem;cursor:pointer}
+    .guide-body{padding:18px 20px;min-height:160px;max-height:56vh;overflow:auto;font-size:0.95rem;color:#123;line-height:1.45}
+    .guide-step-title{font-weight:800;margin-bottom:8px;color:#03203a}
+    .guide-step-desc{margin-bottom:12px;color:#234}
+    .guide-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid rgba(10,30,60,.04);gap:8px}
+    .guide-nav{background:linear-gradient(180deg,#0d7be8,#0b5ac7);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+    .guide-nav:disabled{opacity:.5;cursor:default}
+    .guide-progress{flex:1;text-align:center;font-size:0.9rem;color:#07203a}
+    </style>
+  </div>
+
+  <script>
+/* ── Session helpers (server-backed auth) ── */
+function setSession(user, token){
+  try{
+    if(token) user.token = token;
+    localStorage.setItem("cms_session",JSON.stringify(user));
+  }catch(e){ /* ignore */ }
+}
+function getSession(){ try{ return JSON.parse(localStorage.getItem("cms_session")||"null"); }catch(e){return null;} }
+
+/* If already logged in, verify server session then redirect */
+(async function(){
+  const s = getSession();
+  if(s && s.role){
+    try{
+      const res = await fetch('/api/whoami', { credentials: 'same-origin' });
+      if(res.ok){
+        const data = await res.json().catch(()=>null);
+        if(data && data.user && data.user.role === s.role){
+          window.location.href = `${s.role}_dashboard.html`;
+          return;
+        }
+      }
+    }catch(e){ /* ignore network errors */ }
+    // server session missing or doesn't match — clear stale client session
+    localStorage.removeItem('cms_session');
+  }
+})();
+
+
+async function apiPost(path, body){
+  try{
+    const res = await fetch(path, {method:'POST',credentials: 'same-origin',headers:{'Content-Type':'application/json'},body: JSON.stringify(body)});
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) throw { status: res.status, body: data };
+    return data;
+  }catch(err){ throw err; }
+}
+
+/* ── Theme ── */
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur==="dark"?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next);
+  localStorage.setItem("cms_theme",next);
+  updateThumb();
+}
+function updateThumb(){
+  const isDark = document.documentElement.getAttribute("data-theme")==="dark";
+  const el = document.getElementById("thumb-icon");
+  if(el) el.textContent = isDark?"🌙":"☀️";
+}
+updateThumb();
+
+/* ── Tab switch ── */
+function switchTab(tab){
+  hideAlert();
+  const isLogin = tab==="login";
+  const title = document.getElementById("auth-title");
+  const linkWrap = document.getElementById("auth-login-link");
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+  const loginTab = document.getElementById("tab-login");
+  const registerTab = document.getElementById("tab-register");
+  if (title) title.textContent = isLogin ? "Login" : "Registration";
+  if (linkWrap) {
+    linkWrap.innerHTML = isLogin
+      ? 'Click here <a href="#" onclick="switchTab(\'register\')">Register</a>'
+      : 'Click here <a href="#" onclick="switchTab(\'login\')">Login</a>';
+  }
+  if (loginForm) loginForm.style.display = isLogin ? "flex" : "none";
+  if (registerForm) registerForm.style.display = isLogin ? "none" : "flex";
+  if (loginTab) loginTab.classList.toggle("active", isLogin);
+  if (registerTab) registerTab.classList.toggle("active", !isLogin);
+}
+
+/* ── Password toggle ── */
+function togglePwd(id, btn){
+  const inp = document.getElementById(id);
+  if(!inp) return;
+  inp.type = inp.type==="password"?"text":"password";
+  btn.textContent = inp.type==="password"?"Show":"Hide";
+}
+
+/* ── Password strength ── */
+function checkStrength(val){
+  const hasLen = val.length>=8;
+  const hasMix = /[A-Z]/.test(val)&&/[0-9]/.test(val);
+  const hasSym = /[^A-Za-z0-9]/.test(val);
+  const score  = [hasLen,hasMix,hasSym].filter(Boolean).length;
+  const colors = ["#e5484d","#f5a623","#00c896"];
+  const labels = ["Weak — add more characters","Fair — try mixing numbers & symbols","Strong 💪"];
+  ["pb1","pb2","pb3"].forEach((id,i)=>{
+    document.getElementById(id).style.background = i<score ? colors[score-1] : "var(--border)";
+  });
+  document.getElementById("pwd-label").textContent = val.length ? (labels[score-1]||"") : "";
+  document.getElementById("pwd-label").style.color = score===1?"#b91c1c":score===2?"#9a6510":"#0a7a5a";
+}
+
+/* ── Role select ── */
+const roleDescs = {
+  author:   "✍️ Submit research papers to conferences and track acceptance status.",
+  reviewer: "🔍 Review assigned papers, score them, and submit expert feedback.",
+  admin:    "⚙️ Manage conferences, assign reviewers, and publish final decisions.",
+};
+function selectRole(role, el){
+  document.querySelectorAll(".role-tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById("role-desc").textContent = roleDescs[role];
+}
+
+/* ── Demo fill ── */
+function fillDemo(role){
+  const map = {
+    author:   {email:"author@demo.com",   password:"demo123"},
+    reviewer: {email:"reviewer@demo.com", password:"demo123"},
+    admin:    {email:"admin@demo.com",    password:"demo123"},
+  };
+  document.getElementById("login-email").value    = map[role].email;
+  document.getElementById("login-password").value = map[role].password;
+  showToast(`Demo ${role} credentials filled ✅`);
+}
+
+/* ── Alert ── */
+function showAlert(msg, type="error"){
+  const el = document.getElementById("alert-box");
+  const icons = {error:"⚠️",success:"✅"};
+  el.innerHTML = `${icons[type]||"ℹ️"} ${msg}`;
+  el.className = `alert alert-${type} show`;
+}
+function hideAlert(){
+  const el = document.getElementById("alert-box");
+  el.className = "alert";
+}
+
+/* ── Toast ── */
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.classList.remove("show"), 2600);
+}
+
+
+</script>
+<script>
+// Guide data and interaction
+const guideSteps = [
+  { title: 'Create an account', desc: 'Register as an Author, Reviewer or Admin using the registration tab. Provide a valid email, strong password, and select your role.' },
+  { title: 'Complete your profile', desc: 'After registration, open My Profile and complete affiliation details so conferences and reviewers recognize you.' },
+  { title: 'Submit a paper', desc: 'From the dashboard use "Submit Paper" to create a new submission. Fill title, abstract, keywords, and upload your manuscript (PDF).' },
+  { title: 'Track submission', desc: 'Check "My Submissions" to view status: Submitted, Under review, Accepted/Rejected. Notifications refresh periodically.' },
+  { title: 'Manage reviews', desc: 'If you are a reviewer, accept review invitations, submit scores and comments from the Reviews panel.' },
+  { title: 'Certificates & downloads', desc: 'When a paper is accepted, a completion certificate appears in Certificates — open it to preview and click Download to export your certificate.' },
+  { title: 'Find & register for conferences', desc: 'Browse Conferences to find events. Register for events from the conference details page and manage your registrations in the dashboard.' },
+  { title: 'Help & support', desc: 'Use contact or admin support links for account assistance, or check the docs for common workflows.' }
+];
+let guideIndex = 0;
+
+function openGuide(){
+  guideIndex = 0; renderGuide();
+  const m = document.getElementById('guide-modal'); if(!m) return; m.classList.add('open'); m.setAttribute('aria-hidden','false'); document.getElementById('guide-body').focus();
+}
+function closeGuide(){
+  const m = document.getElementById('guide-modal'); if(!m) return; m.classList.remove('open'); m.setAttribute('aria-hidden','true');
+}
+function renderGuide(){
+  const step = guideSteps[guideIndex];
+  const titleEl = document.getElementById('guide-title-text');
+  const body = document.getElementById('guide-body');
+  const prevBtn = document.getElementById('guide-prev');
+  const nextBtn = document.getElementById('guide-next');
+  const progress = document.getElementById('guide-progress');
+  if(titleEl) titleEl.textContent = step.title;
+  if(body) body.innerHTML = `<div class="guide-step-title">${guideIndex+1}. ${step.title}</div><div class="guide-step-desc">${step.desc}</div>` + renderStepActions(guideIndex);
+  if(prevBtn) prevBtn.disabled = guideIndex===0;
+  if(nextBtn) nextBtn.textContent = guideIndex < guideSteps.length-1 ? 'Next →' : 'Done';
+  if(progress) progress.textContent = `${guideIndex+1} / ${guideSteps.length}`;
+}
+function renderStepActions(i){
+  // add small contextual actions per step for clarity
+  const examples = [
+    '<ul><li>Click Register → choose a role → fill details</li></ul>',
+    '<ul><li>Open Profile → Add affiliation → Save</li></ul>',
+    '<ul><li>Dashboard → Submit Paper → Upload file (PDF)</li></ul>',
+    '<ul><li>Open My Submissions → click title to view details & status</li></ul>',
+    '<ul><li>Reviewer Dashboard → Accept invitation → Submit review</li></ul>',
+    '<ul><li>Certificates → Preview → Download</li></ul>',
+    '<ul><li>Conferences → View details → Register</li></ul>',
+    '<ul><li>Contact admin via support link or email</li></ul>'
+  ];
+  return `<div style="margin-top:8px;color:#123">${examples[i]||''}</div>`;
+}
+function nextGuide(){ if(guideIndex < guideSteps.length-1){ guideIndex++; renderGuide(); } else { closeGuide(); } }
+function prevGuide(){ if(guideIndex>0){ guideIndex--; renderGuide(); } }
+// keyboard support
+document.addEventListener('keydown', (e)=>{
+  const m = document.getElementById('guide-modal'); if(!m || !m.classList.contains('open')) return;
+  if(e.key==='Escape') closeGuide();
+  if(e.key==='ArrowRight') nextGuide();
+  if(e.key==='ArrowLeft') prevGuide();
+});
+// expose for debugging if needed
+window.openGuide = openGuide; window.closeGuide = closeGuide; window.nextGuide = nextGuide; window.prevGuide = prevGuide;
+</script>
+</body>
+</html>

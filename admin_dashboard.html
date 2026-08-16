@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS — Admin Dashboard</title>
+<script>(function(){const t=localStorage.getItem("cms_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
+<style>
+:root{--ink:#1a1040;--ink-2:#5b5484;--ink-3:#9590b0;--paper:#f7f5ff;--card:#ffffff;--border:#ebe5ff;--border-2:#d5cbff;--violet:#5b3df6;--violet-d:#3f20d4;--violet-dd:#2c1c8f;--violet-t:#ede9ff;--violet-t2:#f5f2ff;--coral:#ff6b4a;--coral-d:#e5502f;--coral-t:#fff2ee;--teal:#00c896;--teal-t:#e0fff6;--amber:#f5a623;--amber-t:#fff8e6;--rose:#e5484d;--rose-t:#ffeaea;--sh-md:0 8px 28px rgba(91,61,246,.12);--sh-lg:0 20px 50px rgba(91,61,246,.18);}
+[data-theme="dark"]{--ink:#e8e3ff;--ink-2:#9d96c8;--ink-3:#6b6489;--paper:#0d0b1a;--card:#16132a;--border:#2a2448;--border-2:#3d3570;--violet-t:#1e1640;--violet-t2:#18122e;--coral-t:#2a1410;--teal-t:#071f18;--amber-t:#1f1608;--rose-t:#1f0b0c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--paper);color:var(--ink);display:flex;flex-direction:column;min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 10% 0%,rgba(91,61,246,.08) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 90% 5%,rgba(255,107,74,.06) 0%,transparent 55%),var(--paper);transition:background .3s;}
+.topbar{height:58px;background:rgba(255,255,255,.85);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(91,61,246,.07);transition:background .3s;}
+[data-theme="dark"] .topbar{background:rgba(16,14,32,.88);}
+.topbar-brand{font-family:Georgia,serif;font-weight:700;font-size:1.1rem;color:var(--violet);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.topbar-gem{width:28px;height:28px;background:linear-gradient(135deg,var(--violet),var(--coral));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem;box-shadow:0 3px 10px rgba(91,61,246,.3);}
+.topbar-search{flex:1;max-width:360px;position:relative;margin-left:24px;}
+.topbar-search input{width:100%;padding:8px 14px 8px 36px;border:1.5px solid var(--border);border-radius:999px;font-size:.85rem;background:var(--paper);color:var(--ink);transition:border-color .2s,background .3s;}
+.topbar-search input:focus{outline:none;border-color:var(--violet);background:var(--card);}
+.topbar-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-3);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.theme-pill{display:flex;align-items:center;background:var(--border);border-radius:999px;padding:3px;border:1px solid var(--border-2);cursor:pointer;transition:background .3s;}
+[data-theme="dark"] .theme-pill{background:#1e1640;border-color:#3d3570;}
+.theme-pill-track{width:44px;height:22px;position:relative;}
+.theme-pill-thumb{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:0;left:0;box-shadow:0 1px 4px rgba(0,0,0,.18);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center;font-size:.65rem;}
+[data-theme="dark"] .theme-pill-thumb{transform:translateX(22px);}
+.theme-sun,.theme-moon{position:absolute;top:50%;transform:translateY(-50%);font-size:.6rem;pointer-events:none;}
+.theme-sun{left:4px;}.theme-moon{right:4px;}
+.notif-btn{position:relative;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:background .2s;}
+.notif-btn:hover{background:var(--violet-t);}
+.notif-badge{position:absolute;top:3px;right:3px;width:8px;height:8px;background:var(--coral);border-radius:50%;border:2px solid var(--card);}
+.profile-pill{display:flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;transition:background .2s;}
+.profile-pill:hover{background:var(--violet-t);}
+.avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--coral));display:flex;align-items:center;justify-content:center;font-size:.78rem;color:#fff;font-weight:700;}
+.profile-name{font-size:.82rem;font-weight:600;color:var(--ink);}
+.dropdown-wrap{position:relative;}
+.dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border:1px solid var(--border-2);border-radius:14px;padding:6px;min-width:190px;box-shadow:var(--sh-lg);display:none;z-index:999;animation:dropIn .18s ease;}
+.dropdown.open{display:block;}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.drop-header{padding:10px 12px;border-bottom:1px solid var(--border);margin-bottom:4px;}
+.drop-name{font-weight:700;font-size:.88rem;color:var(--ink);}
+.drop-role{font-size:.73rem;color:var(--ink-2);margin-top:1px;}
+.drop-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;font-size:.84rem;color:var(--ink);cursor:pointer;border:none;background:none;width:100%;text-align:left;text-decoration:none;transition:background .15s;}
+.drop-item:hover{background:var(--violet-t2);}
+.drop-item.danger{color:var(--rose);}
+.drop-item.danger:hover{background:var(--rose-t);}
+.drop-sep{height:1px;background:var(--border);margin:4px 0;}
+.shell{display:flex;flex:1;}
+.sidebar{width:220px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px 0;overflow-y:auto;position:sticky;top:58px;height:calc(100vh - 58px);transition:background .3s,border-color .3s;}
+[data-theme="dark"] .sidebar{background:#100e20;border-color:#2a2448;}
+.sidebar-label{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);padding:10px 18px 4px;margin-top:6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;margin:1px 8px;border-radius:10px;cursor:pointer;font-size:.875rem;font-weight:500;color:var(--ink-2);text-decoration:none;border:none;background:none;width:calc(100% - 16px);text-align:left;transition:background .18s,color .18s;}
+.nav-item:hover{background:var(--violet-t2);color:var(--ink);}
+.nav-item.active{background:var(--violet-t);color:var(--violet-d);font-weight:700;}
+.nav-icon{width:20px;text-align:center;font-size:1rem;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--coral);color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:999px;}
+.sidebar-bottom{margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--border);}
+.main{flex:1;overflow-y:auto;padding:28px 28px 40px;}
+.page-view{animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.greeting-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.greeting-text h2{font-family:Georgia,serif;font-size:1.6rem;font-weight:700;margin-bottom:4px;}
+.greeting-text p{color:var(--ink-2);font-size:.9rem;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-c{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s,background .3s;}
+.stat-c:hover{transform:translateY(-2px);box-shadow:var(--sh-md);}
+[data-theme="dark"] .stat-c{background:#16132a;border-color:#2a2448;}
+.stat-c-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:10px;}
+.stat-c-num{font-family:Georgia,serif;font-size:2rem;font-weight:800;line-height:1;}
+.stat-c-sub{font-size:.75rem;color:var(--ink-2);margin-top:6px;}
+.stat-c-icon{position:absolute;right:16px;top:16px;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.stat-c-glow{position:absolute;width:80px;height:80px;border-radius:50%;opacity:.1;bottom:-20px;right:-10px;}
+.sv .stat-c-num{color:var(--violet);}.sv .stat-c-icon{background:var(--violet-t);}.sv .stat-c-glow{background:var(--violet);}
+.sg .stat-c-num{color:var(--teal);}.sg .stat-c-icon{background:var(--teal-t);}.sg .stat-c-glow{background:var(--teal);}
+.sa .stat-c-num{color:var(--amber);}.sa .stat-c-icon{background:var(--amber-t);}.sa .stat-c-glow{background:var(--amber);}
+.sc .stat-c-num{color:var(--coral);}.sc .stat-c-icon{background:var(--coral-t);}.sc .stat-c-glow{background:var(--coral);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:background .3s,border-color .3s;}
+[data-theme="dark"] .panel{background:#16132a;border-color:#2a2448;}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.panel-head h3{font-family:Georgia,serif;font-size:1rem;font-weight:700;}
+.panel-head a,.panel-head button{font-size:.78rem;font-weight:600;color:var(--violet);text-decoration:none;background:none;border:none;cursor:pointer;}
+.panel-body{padding:0;}
+.chart-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:18px;overflow:hidden;transition:background .3s;}
+[data-theme="dark"] .chart-panel{background:#16132a;border-color:#2a2448;}
+.chart-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.chart-head h3{font-family:Georgia,serif;font-size:1rem;font-weight:700;}
+.chart-tabs{display:flex;gap:4px;}
+.ctab{padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:none;font-size:.75rem;font-weight:600;color:var(--ink-2);cursor:pointer;transition:all .18s;}
+.ctab.active,.ctab:hover{background:var(--violet-t);border-color:var(--border-2);color:var(--violet-d);}
+.chart-body{padding:20px;}
+table{width:100%;border-collapse:collapse;}
+thead{background:linear-gradient(90deg,var(--violet-t2),#f0ecff);}
+[data-theme="dark"] thead{background:linear-gradient(90deg,#1a1535,#201a3a);}
+th{text-align:left;padding:12px 16px;font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);border-bottom:1.5px solid var(--border);}
+td{padding:13px 16px;font-size:.87rem;border-bottom:1px solid var(--border);vertical-align:middle;}
+tbody tr{transition:background .15s;}
+tbody tr:hover{background:var(--violet-t2);}
+tbody tr:last-child td{border-bottom:none;}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700;border:1px solid transparent;}
+.badge-submitted{background:#ede9ff;color:#4f2dcc;border-color:#c8baff;}
+.badge-review{background:var(--amber-t);color:#9a6510;border-color:#f5d080;}
+.badge-accepted{background:var(--teal-t);color:#0a7a5a;border-color:#6ddbb9;}
+.badge-rejected{background:var(--rose-t);color:#b91c1c;border-color:#fcb5b7;}
+[data-theme="dark"] .badge-submitted{background:#1e1640;color:#a78bfa;border-color:#3d3570;}
+[data-theme="dark"] .badge-review{background:#1f1608;color:#fbbf24;border-color:#3a2b10;}
+[data-theme="dark"] .badge-accepted{background:#071f18;color:#34d399;border-color:#0e3028;}
+[data-theme="dark"] .badge-rejected{background:#1f0b0c;color:#f87171;border-color:#3d1014;}
+.action-btn{padding:5px 12px;border-radius:999px;font-size:.76rem;font-weight:700;cursor:pointer;border:none;transition:all .18s;}
+.ab-green{background:var(--teal-t);color:#0a7a5a;border:1px solid #6ddbb9;}
+.ab-green:hover{background:#b3edd9;}
+.ab-red{background:var(--rose-t);color:#b91c1c;border:1px solid #fcb5b7;}
+.ab-red:hover{background:#ffd0d1;}
+.ab-violet{background:var(--violet-t);color:var(--violet-d);border:1px solid #c8baff;}
+.ab-violet:hover{background:#ddd5ff;}
+.qbtn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;font-size:.84rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .18s;}
+.qbtn-primary{background:linear-gradient(135deg,var(--violet),var(--violet-d));color:#fff;box-shadow:0 4px 14px rgba(91,61,246,.28);}
+.qbtn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(91,61,246,.36);}
+.qbtn-ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--border-2);}
+.qbtn-ghost:hover{background:var(--violet-t2);border-color:var(--violet);color:var(--violet-d);}
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:18px;transition:background .3s;}
+[data-theme="dark"] .form-card{background:#16132a;border-color:#2a2448;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.fg{display:flex;flex-direction:column;gap:6px;}
+.fg label{font-size:.77rem;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em;}
+.fg input,.fg select,.fg textarea{padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:.88rem;font-family:inherit;color:var(--ink);background:var(--paper);transition:border-color .18s,background .3s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--violet);background:var(--card);box-shadow:0 0 0 3px rgba(91,61,246,.1);}
+[data-theme="dark"] .fg input,[data-theme="dark"] .fg select,[data-theme="dark"] .fg textarea{background:#0f0d1e;border-color:#2a2448;color:#e8e3ff;}
+[data-theme="dark"] .fg input:focus,[data-theme="dark"] .fg select:focus,[data-theme="dark"] .fg textarea:focus{background:#16132a;}
+.fg textarea{resize:vertical;min-height:90px;line-height:1.6;}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-head h2{font-family:Georgia,serif;font-size:1.3rem;}
+.page-header{margin-bottom:24px;}
+.page-header h1{font-family:Georgia,serif;font-size:1.6rem;margin-bottom:4px;}
+.page-header p{color:var(--ink-2);font-size:.9rem;}
+.trend-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.trend-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;transition:background .3s;}
+[data-theme="dark"] .trend-card{background:#16132a;border-color:#2a2448;}
+.trend-card h4{font-family:Georgia,serif;font-size:.95rem;margin-bottom:14px;}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.ftab{padding:5px 13px;border-radius:999px;border:1px solid var(--border);background:none;font-size:.75rem;font-weight:600;color:var(--ink-2);cursor:pointer;transition:all .18s;}
+.ftab.active,.ftab:hover{background:var(--violet-t);border-color:var(--border-2);color:var(--violet-d);}
+.alert-inline{padding:10px 14px;border-radius:10px;font-size:.84rem;font-weight:500;border-left:4px solid transparent;display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.ai-success{background:var(--teal-t);color:#0a7a5a;border-color:var(--teal);}
+.ai-error{background:var(--rose-t);color:#b91c1c;border-color:var(--rose);}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 22px;border-radius:999px;font-size:.85rem;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.25);opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:9999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media(max-width:900px){.stats-row{grid-template-columns:1fr 1fr;}.two-col,.trend-grid{grid-template-columns:1fr;}.sidebar{width:64px;}.sidebar .nav-item span:not(.nav-icon){display:none;}.sidebar-label{display:none;}.topbar-search{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-gem">◈</div>
+    CMS <span style="font-size:.7rem;background:var(--rose-t);color:var(--rose);padding:2px 8px;border-radius:999px;margin-left:4px;font-family:inherit;font-weight:700;">Admin</span>
+  </div>
+  <div class="topbar-search">
+    <span class="topbar-search-icon">🔍</span>
+    <input type="text" placeholder="Search users, papers, conferences…">
+  </div>
+  <div class="topbar-right">
+    <button class="theme-pill" onclick="toggleTheme()">
+      <div class="theme-pill-track">
+        <span class="theme-sun">☀️</span>
+        <span class="theme-moon">🌙</span>
+        <div class="theme-pill-thumb" id="thumb">☀️</div>
+      </div>
+    </button>
+    <button class="notif-btn" onclick="showPage('notifications')">🔔<span class="notif-badge"></span></button>
+    <div class="dropdown-wrap">
+      <button class="profile-pill" onclick="toggleDrop()">
+        <div class="avatar" id="topbar-av">A</div>
+        <span class="profile-name" id="topbar-nm">Admin</span>
+        <span style="color:var(--ink-3);font-size:.68rem;">▾</span>
+      </button>
+      <div class="dropdown" id="profile-drop">
+        <div class="drop-header">
+          <div class="drop-name" id="drop-name">Dr. Ramesh K.</div>
+          <div class="drop-role">Administrator</div>
+        </div>
+        <a href="#" class="drop-item" onclick="showPage('profile')">👤 My Profile</a>
+        <a href="#" class="drop-item" onclick="showPage('settings')">⚙️ Settings</a>
+        <div class="drop-sep"></div>
+        <button class="drop-item danger" onclick="logout()">🚪 Logout</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-label">Dashboard</div>
+  <a class="nav-item active" href="#" onclick="showPage('overview')"><span class="nav-icon">🏠</span><span>Overview</span></a>
+  <a class="nav-item" href="#" onclick="showPage('conferences')"><span class="nav-icon">📅</span><span>Conferences</span></a>
+  <a class="nav-item" href="#" onclick="showPage('papers')"><span class="nav-icon">📄</span><span>All Papers</span><span class="nav-badge">5</span></a>
+  <a class="nav-item" href="#" onclick="showPage('reviewers')"><span class="nav-icon">🔍</span><span>Reviewers</span></a>
+  <a class="nav-item" href="#" onclick="showPage('users')"><span class="nav-icon">👥</span><span>Users</span></a>
+  <a class="nav-item" href="#" onclick="showPage('results')"><span class="nav-icon">📢</span><span>Publish Results</span></a>
+  <div class="sidebar-label">Analytics</div>
+  <a class="nav-item" href="#" onclick="showPage('trends')"><span class="nav-icon">📈</span><span>Trends</span></a>
+  <div class="sidebar-label">Manage</div>
+  <a class="nav-item" href="#" onclick="showPage('create-conf')"><span class="nav-icon">＋</span><span>New Conference</span></a>
+  <a class="nav-item" href="#" onclick="showPage('notifications')"><span class="nav-icon">🔔</span><span>Notifications</span></a>
+  <div class="sidebar-bottom">
+    <a class="nav-item" href="#" onclick="showPage('profile')"><span class="nav-icon">👤</span><span>Profile</span></a>
+    <a class="nav-item" href="#" onclick="showPage('settings')"><span class="nav-icon">⚙</span><span>Settings</span></a>
+    <a class="nav-item" href="#" onclick="logout()" style="color:var(--rose);"><span class="nav-icon">🚪</span><span>Logout</span></a>
+  </div>
+</aside>
+
+<main class="main">
+
+<!-- OVERVIEW -->
+<div id="page-overview" class="page-view">
+  <div class="greeting-row">
+    <div class="greeting-text">
+      <h2 id="greeting">Good morning, Admin 👋</h2>
+      <p>Platform overview — manage everything from here.</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="qbtn qbtn-primary" onclick="showPage('create-conf')">＋ New Conference</button>
+      <button class="qbtn qbtn-ghost" onclick="showPage('trends')">📈 View Trends</button>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-c sv"><div class="stat-c-glow"></div><div class="stat-c-icon">🎪</div><div class="stat-c-label">Conferences</div><div class="stat-c-num" id="overview-conferences-count">06</div><div class="stat-c-sub" id="overview-conferences-sub">3 active</div></div>
+    <div class="stat-c sg"><div class="stat-c-glow"></div><div class="stat-c-icon">📄</div><div class="stat-c-label">Papers</div><div class="stat-c-num" id="overview-papers-count">42</div><div class="stat-c-sub" id="overview-papers-sub">+8 this week</div></div>
+    <div class="stat-c sa"><div class="stat-c-glow"></div><div class="stat-c-icon">⏳</div><div class="stat-c-label">Pending Review</div><div class="stat-c-num" id="overview-pending-count">11</div><div class="stat-c-sub" id="overview-pending-sub">Needs action</div></div>
+    <div class="stat-c sc"><div class="stat-c-glow"></div><div class="stat-c-icon">👥</div><div class="stat-c-label">Users</div><div class="stat-c-num" id="overview-users-count">128</div><div class="stat-c-sub" id="overview-users-sub">24 new</div></div>
+  </div>
+
+  <div class="two-col">
+    <!-- Recent papers -->
+    <div class="panel">
+      <div class="panel-head"><h3>Recent Submissions</h3><a href="#" onclick="showPage('papers')">View All →</a></div>
+      <div class="panel-body">
+        <table>
+          <thead><tr><th>Title</th><th>Author</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="recent-submissions-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Upcoming conferences -->
+    <div class="panel">
+      <div class="panel-head"><h3>Active Conferences</h3><a href="#" onclick="showPage('conferences')">Manage →</a></div>
+      <div class="panel-body">
+        <table>
+          <thead><tr><th>Conference</th><th>Deadline</th><th>Submissions</th></tr></thead>
+          <tbody id="active-conferences-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Platform Activity Chart -->
+  <div class="chart-panel">
+    <div class="chart-head">
+      <h3>Platform Activity</h3>
+      <div class="chart-tabs">
+        <button class="ctab active" onclick="switchAdminChart('submissions',this)">Submissions</button>
+        <button class="ctab" onclick="switchAdminChart('users',this)">Users</button>
+        <button class="ctab" onclick="switchAdminChart('conferences',this)">Conferences</button>
+      </div>
+    </div>
+    <div class="chart-body"><canvas id="adminChart" height="85"></canvas></div>
+  </div>
+</div>
+
+<!-- TRENDS (Admin only) -->
+<div id="page-trends" class="page-view" style="display:none;">
+  <div class="page-header">
+    <h1>📈 Conference Trends Analysis</h1>
+    <p>Deep analytics on submission patterns, acceptance rates, and participation trends. Only visible to admins.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-c sv"><div class="stat-c-glow"></div><div class="stat-c-icon">📊</div><div class="stat-c-label">Acceptance Rate</div><div class="stat-c-num">62%</div><div class="stat-c-sub">+5% vs last year</div></div>
+    <div class="stat-c sg"><div class="stat-c-glow"></div><div class="stat-c-icon">🏆</div><div class="stat-c-label">Avg Score</div><div class="stat-c-num">7.4</div><div class="stat-c-sub">Out of 10</div></div>
+    <div class="stat-c sa"><div class="stat-c-glow"></div><div class="stat-c-icon">⏱</div><div class="stat-c-label">Avg Review Time</div><div class="stat-c-num">4.2</div><div class="stat-c-sub">Days</div></div>
+    <div class="stat-c sc"><div class="stat-c-glow"></div><div class="stat-c-icon">🌍</div><div class="stat-c-label">Institutions</div><div class="stat-c-num">38</div><div class="stat-c-sub">Represented</div></div>
+  </div>
+
+  <div class="trend-grid">
+    <div class="trend-card">
+      <h4>Submissions per Conference</h4>
+      <canvas id="trendChart1" height="150"></canvas>
+    </div>
+    <div class="trend-card">
+      <h4>Acceptance vs Rejection Rate</h4>
+      <canvas id="trendChart2" height="150"></canvas>
+    </div>
+    <div class="trend-card">
+      <h4>Monthly Submission Growth</h4>
+      <canvas id="trendChart3" height="150"></canvas>
+    </div>
+    <div class="trend-card">
+      <h4>Top Research Topics</h4>
+      <canvas id="trendChart4" height="150"></canvas>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <h3 style="font-family:Georgia,serif;margin-bottom:16px;">Detailed Statistics Table</h3>
+    <table>
+      <thead><tr><th>Conference</th><th>Submissions</th><th>Accepted</th><th>Rejected</th><th>Pending</th><th>Acceptance %</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600;">AI Summit 2026</td><td>14</td><td>8</td><td>4</td><td>2</td><td><span style="color:var(--teal);font-weight:700;">57%</span></td></tr>
+        <tr><td style="font-weight:600;">IoTConf 2026</td><td>9</td><td>6</td><td>2</td><td>1</td><td><span style="color:var(--teal);font-weight:700;">67%</span></td></tr>
+        <tr><td style="font-weight:600;">SmartTech 2026</td><td>7</td><td>4</td><td>3</td><td>0</td><td><span style="color:var(--amber);font-weight:700;">57%</span></td></tr>
+        <tr><td style="font-weight:600;">NLP Summit 2025</td><td>12</td><td>8</td><td>3</td><td>1</td><td><span style="color:var(--teal);font-weight:700;">67%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ALL PAPERS -->
+<div id="page-papers" class="page-view" style="display:none;">
+  <div class="page-header"><h1>All Submitted Papers</h1><p>Review submissions and assign reviewers.</p></div>
+  <div class="filter-row">
+    <button class="ftab active" onclick="filterPapers('all',this)">All (42)</button>
+    <button class="ftab" onclick="filterPapers('new',this)">New</button>
+    <button class="ftab" onclick="filterPapers('review',this)">Under Review</button>
+    <button class="ftab" onclick="filterPapers('accepted',this)">Accepted</button>
+    <button class="ftab" onclick="filterPapers('rejected',this)">Rejected</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;">
+    <button class="qbtn qbtn-primary" onclick="addUser('reviewer')">＋ Add Reviewer</button>
+  </div>
+  <div class="panel">
+    <div class="panel-body">
+      <table>
+        <thead><tr><th>Title</th><th>Author</th><th>Conference</th><th>Submitted</th><th>Status</th><th>Reviewer</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600;">AI in Healthcare Systems</td><td>Madhav Kumar</td><td style="color:var(--ink-2);font-size:.83rem;">ICAI 2026</td><td style="color:var(--ink-3);font-size:.82rem;">12 Jan</td><td><span class="badge badge-review">Review</span></td><td style="font-size:.82rem;color:var(--ink-2);">Priya N.</td><td><button class="action-btn ab-violet" onclick="showToast('Reviewer re-assigned ✅')">Re-assign</button></td></tr>
+          <tr><td style="font-weight:600;">IoT Security Framework</td><td>Anand Raj</td><td style="color:var(--ink-2);font-size:.83rem;">IoTConf 2026</td><td style="color:var(--ink-3);font-size:.82rem;">3 Feb</td><td><span class="badge badge-accepted">Accepted</span></td><td style="font-size:.82rem;color:var(--ink-2);">Dr. Kumar</td><td><button class="action-btn ab-green" onclick="showToast('Result published ✅')">Publish</button></td></tr>
+          <tr><td style="font-weight:600;">Smart City Architecture</td><td>Kavitha S.</td><td style="color:var(--ink-2);font-size:.83rem;">SmartTech 2026</td><td style="color:var(--ink-3);font-size:.82rem;">18 Feb</td><td><span class="badge badge-submitted">New</span></td><td style="color:var(--ink-3);font-size:.82rem;">—</td><td><button class="action-btn ab-violet" onclick="showToast('Reviewer assigned ✅')">Assign</button></td></tr>
+          <tr><td style="font-weight:600;">Deep Learning in NLP</td><td>Ravi M.</td><td style="color:var(--ink-2);font-size:.83rem;">NLP Summit</td><td style="color:var(--ink-3);font-size:.82rem;">5 Nov</td><td><span class="badge badge-rejected">Rejected</span></td><td style="font-size:.82rem;color:var(--ink-2);">Suresh B.</td><td><button class="action-btn ab-red" onclick="showToast('Status updated ✅')">Appeal</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CONFERENCES MANAGE -->
+<div id="page-conferences" class="page-view" style="display:none;">
+  <div class="page-header"><h1>Conferences</h1><p>Create and manage conference listings.</p></div>
+  <div style="display:flex;gap:8px;margin-bottom:16px;">
+    <button class="qbtn qbtn-primary" onclick="showPage('create-conf')">＋ New Conference</button>
+  </div>
+  <div class="panel">
+    <div class="panel-body">
+      <table>
+        <thead><tr><th>Name</th><th>Date</th><th>Venue</th><th>Deadline</th><th>Submissions</th><th>Actions</th></tr></thead>
+        <tbody id="confs-table">
+          <tr><td style="font-weight:600;">AI Summit 2026</td><td style="color:var(--ink-2);font-size:.83rem;">24 Sep</td><td style="color:var(--ink-2);font-size:.83rem;">Chennai</td><td style="color:var(--rose);font-size:.82rem;font-weight:600;">15 Sep</td><td style="font-weight:700;color:var(--violet);">14</td><td><button class="action-btn ab-violet" onclick="showToast('Editing conference…')">Edit</button> <button class="action-btn ab-red" onclick="showToast('Conference deleted')">Delete</button></td></tr>
+          <tr><td style="font-weight:600;">IoTConf 2026</td><td style="color:var(--ink-2);font-size:.83rem;">12 Oct</td><td style="color:var(--ink-2);font-size:.83rem;">Bangalore</td><td style="color:var(--amber);font-size:.82rem;font-weight:600;">1 Oct</td><td style="font-weight:700;color:var(--violet);">9</td><td><button class="action-btn ab-violet" onclick="showToast('Editing conference…')">Edit</button> <button class="action-btn ab-red" onclick="showToast('Conference deleted')">Delete</button></td></tr>
+          <tr><td style="font-weight:600;">SmartTech 2026</td><td style="color:var(--ink-2);font-size:.83rem;">5 Nov</td><td style="color:var(--ink-2);font-size:.83rem;">Pune</td><td style="color:var(--ink-2);font-size:.82rem;">25 Oct</td><td style="font-weight:700;color:var(--violet);">7</td><td><button class="action-btn ab-violet" onclick="showToast('Editing conference…')">Edit</button> <button class="action-btn ab-red" onclick="showToast('Conference deleted')">Delete</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE CONFERENCE -->
+<div id="page-create-conf" class="page-view" style="display:none;">
+  <div class="page-header"><h1>Create Conference</h1><p>Set up a new call for papers.</p></div>
+  <div class="form-card">
+    <div class="fg" style="margin-bottom:14px;"><label>Conference Name</label><input id="conf-name" type="text" placeholder="e.g. International Conference on AI 2026"></div>
+    <div class="form-row">
+      <div class="fg"><label>Conference Date</label><input id="conf-date" type="date"></div>
+      <div class="fg"><label>Submission Deadline</label><input id="conf-deadline" type="date"></div>
+    </div>
+    <div class="fg" style="margin-bottom:14px;"><label>Venue</label><input id="conf-venue" type="text" placeholder="e.g. Chennai Trade Centre"></div>
+    <div class="fg" style="margin-bottom:14px;"><label>Description</label><textarea id="conf-desc" placeholder="Brief overview of the conference theme and scope…"></textarea></div>
+    <div style="display:flex;gap:10px;">
+      <button class="qbtn qbtn-primary" onclick="createConference()">Save Conference ✓</button>
+      <button class="qbtn qbtn-ghost" onclick="showPage('conferences')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEWERS -->
+<div id="page-reviewers" class="page-view" style="display:none;">
+  <div class="page-header"><h1>Reviewers</h1><p>Manage reviewers and view their workload.</p></div>
+  <div class="panel">
+    <div class="panel-body">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Assigned</th><th>Completed</th><th>Avg Score</th><th>Status</th></tr></thead>
+        <tbody id="reviewers-table">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- USERS -->
+<div id="page-users" class="page-view" style="display:none;">
+  <div class="page-header"><h1>All Users</h1><p>Manage platform users and their roles.</p></div>
+  <div class="panel">
+    <div class="panel-body">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>College</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody id="users-table">
+          <tr><td style="font-weight:600;">Madhav Kumar</td><td style="color:var(--ink-2);">madhav@uni.edu</td><td><span class="badge badge-submitted">Author</span></td><td style="color:var(--ink-2);font-size:.83rem;">IIT Madras</td><td style="color:var(--ink-3);font-size:.82rem;">Jan 2026</td><td><button class="action-btn ab-red" onclick="showToast('User removed')">Remove</button></td></tr>
+          <tr><td style="font-weight:600;">Priya Nair</td><td style="color:var(--ink-2);">priya@reviewer.com</td><td><span class="badge badge-review">Reviewer</span></td><td style="color:var(--ink-2);font-size:.83rem;">NIT Trichy</td><td style="color:var(--ink-3);font-size:.82rem;">Dec 2025</td><td><button class="action-btn ab-red" onclick="showToast('User removed')">Remove</button></td></tr>
+          <tr><td style="font-weight:600;">Dr. Ramesh K.</td><td style="color:var(--ink-2);">admin@cms.com</td><td><span class="badge badge-accepted">Admin</span></td><td style="color:var(--ink-2);font-size:.83rem;">Anna Univ.</td><td style="color:var(--ink-3);font-size:.82rem;">Nov 2025</td><td><button class="action-btn ab-violet" onclick="showToast('Cannot remove admin')">Edit</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISH RESULTS -->
+<div id="page-results" class="page-view" style="display:none;">
+  <div class="page-header"><h1>Publish Results</h1><p>Approve reviewer decisions and notify authors.</p></div>
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <div style="background:var(--violet-t2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:.83rem;font-weight:600;color:var(--violet-d);">📋 18 Total Reviews</div>
+    <div style="background:var(--amber-t);border:1px solid #f5d080;border-radius:10px;padding:10px 16px;font-size:.83rem;font-weight:600;color:#9a6510;">⏳ 7 Pending Publish</div>
+    <div style="background:var(--teal-t);border:1px solid #6ddbb9;border-radius:10px;padding:10px 16px;font-size:.83rem;font-weight:600;color:#0a7a5a;">✅ 11 Published</div>
+  </div>
+  <div class="panel">
+    <div class="panel-body">
+      <table>
+        <thead><tr><th>Paper</th><th>Reviewer</th><th>Score</th><th>Decision</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600;">IoT Security Framework</td><td>Priya Nair</td><td><span style="font-weight:700;color:var(--teal);">8/10</span></td><td><span style="color:var(--teal);font-weight:700;">✅ Accept</span></td><td><span class="badge badge-accepted">Accepted</span></td><td><button class="action-btn ab-green" onclick="showToast('Result published ✅')">Publish</button></td></tr>
+          <tr><td style="font-weight:600;">Deep Learning NLP</td><td>Dr. Suresh B.</td><td><span style="font-weight:700;color:var(--teal);">9/10</span></td><td><span style="color:var(--teal);font-weight:700;">✅ Accept</span></td><td><span class="badge badge-submitted">Pending</span></td><td><button class="action-btn ab-green" onclick="showToast('Result published ✅')">Publish</button></td></tr>
+          <tr><td style="font-weight:600;">Blockchain in Education</td><td>Ananya K.</td><td><span style="font-weight:700;color:var(--rose);">4/10</span></td><td><span style="color:var(--rose);font-weight:700;">❌ Reject</span></td><td><span class="badge badge-submitted">Pending</span></td><td><button class="action-btn ab-red" onclick="showToast('Rejection published ✅')">Publish</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="page-notifications" class="page-view" style="display:none;">
+  <div class="page-header"><h1>Notifications</h1></div>
+  <div class="panel">
+    <div class="panel-head"><h3>Recent</h3><button onclick="markAllNotificationsRead()">Mark all read</button></div>
+    <div class="panel-body" style="padding:16px 20px;">
+      <div id="admin-notification-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div id="page-profile" class="page-view" style="display:none;">
+  <div class="page-header"><h1>My Profile</h1></div>
+  <div class="form-card">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--coral));display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#fff;font-weight:800;" id="profile-av">A</div>
+      <div><div id="profile-name-h" style="font-family:Georgia,serif;font-size:1.2rem;font-weight:700;">Dr. Ramesh K.</div><div style="color:var(--rose);font-size:.8rem;font-weight:600;margin-top:2px;">⚙️ Administrator</div></div>
+    </div>
+    <div class="form-row"><div class="fg"><label>Full Name</label><input type="text" id="p-name" value="Dr. Ramesh K."></div><div class="fg"><label>Email</label><input type="email" value="admin@cms.com" readonly style="background:var(--violet-t2);cursor:not-allowed;"></div></div>
+    <div class="fg" style="margin-bottom:14px;"><label>College / Organization</label><input type="text" value="Anna University"></div>
+    <button class="qbtn qbtn-primary" onclick="saveAdminProfile()" style="margin-top:4px;">💾 Save Changes</button>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="page-settings" class="page-view" style="display:none;">
+  <div class="page-header"><h1>Settings</h1></div>
+  <div class="form-card">
+    <h3 style="font-family:Georgia,serif;margin-bottom:16px;">Appearance</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div><div style="font-weight:600;font-size:.88rem;">Dark Mode</div><div style="font-size:.78rem;color:var(--ink-2);">Toggle light and dark theme</div></div>
+      <button class="theme-pill" onclick="toggleTheme()"><div class="theme-pill-track"><span class="theme-sun">☀️</span><span class="theme-moon">🌙</span><div class="theme-pill-thumb">☀️</div></div></button>
+    </div>
+  </div>
+  <div class="form-card">
+    <h3 style="font-family:Georgia,serif;margin-bottom:16px;">Change Password</h3>
+    <div class="form-row"><div class="fg"><label>Current Password</label><input type="password" placeholder="••••••••"></div><div class="fg"><label>New Password</label><input type="password" placeholder="••••••••"></div></div>
+    <button class="qbtn qbtn-primary" style="margin-top:6px;" onclick="showToast('Password updated ✅')">Update Password</button>
+  </div>
+</div>
+
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+/* ── Auth guard ── */
+const session = JSON.parse(localStorage.getItem("cms_session")||"null");
+if(!session || session.role !== "admin"){
+  window.location.href = "login.html";
+}else{
+  document.getElementById("topbar-nm").textContent = session.name.split(" ")[0];
+  document.getElementById("topbar-av").textContent  = session.name[0];
+  document.getElementById("drop-name").textContent  = session.name;
+  document.getElementById("profile-av").textContent = session.name[0];
+  const pn = document.getElementById("profile-name-h");
+  if(pn) pn.textContent = session.name;
+  const pnin = document.getElementById("p-name");
+  if(pnin) pnin.value = session.name;
+  const h = new Date().getHours();
+  const g = h<12?"Good morning":h<17?"Good afternoon":"Good evening";
+  document.getElementById("greeting").textContent = `${g}, ${session.name.split(" ")[0]} 👋`;
+}
+
+async function logout(){
+  try{ await fetch('/api/logout',{method:'POST'}); }catch(e){}
+  localStorage.removeItem("cms_session"); window.location.href="login.html";
+}
+
+/* ── Theme ── */
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur==="dark"?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next);
+  localStorage.setItem("cms_theme",next);
+  updateThumb();
+  if(adminChart) adminChart.destroy(), adminChart=null, renderAdminChart();
+}
+function updateThumb(){
+  const d=document.documentElement.getAttribute("data-theme")==="dark";
+  document.querySelectorAll(".theme-pill-thumb").forEach(el=>el.textContent=d?"🌙":"☀️");
+}
+updateThumb();
+
+/* ── Dropdown ── */
+function toggleDrop(){ document.getElementById("profile-drop").classList.toggle("open"); }
+document.addEventListener("click",e=>{ if(!e.target.closest(".dropdown-wrap")) document.querySelectorAll(".dropdown").forEach(d=>d.classList.remove("open")); });
+
+/* ── Pages ── */
+function showPage(id){
+  document.querySelectorAll(".page-view").forEach(p=>p.style.display="none");
+  const pg = document.getElementById("page-"+id);
+  if(pg) pg.style.display="block";
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  const m = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
+  if(m) m.classList.add("active");
+  document.getElementById("profile-drop")?.classList.remove("open");
+  if(id==="overview") setTimeout(renderAdminChart,80);
+  if(id==="trends")   setTimeout(renderTrendCharts,80);
+  if(id==="notifications") loadNotifications();
+}
+
+/* ── Toast ── */
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2400);
+}
+
+/* ── Misc ── */
+function filterPapers(f,btn){ document.querySelectorAll(".ftab").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); showToast(`Filtered: ${f}`); }
+async function saveAdminProfile(){ try{ const n=document.getElementById("p-name").value; const college=document.querySelector('#page-profile .form-card input[type=text]')?.value || null; const userId = session && session.id; if(!userId){ showToast('Not authenticated'); return; } const payload = { name: n, college }; const res = await fetch(`/api/users/${userId}`, { method: 'PUT', credentials: 'same-origin', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) }); if(!res.ok){ const err = await res.json().catch(()=>({error:'Save failed'})); showToast(err.error || 'Save failed'); return; } const updated = await res.json(); // update local session copy
+      session.name = updated.name || session.name; session.college = updated.college || session.college; localStorage.setItem('cms_session', JSON.stringify(session)); document.getElementById('topbar-nm').textContent = session.name.split(' ')[0]; document.getElementById('profile-name-h').textContent = session.name; showToast('Profile saved ✅'); }catch(e){ console.error(e); showToast('Save failed'); } }
+
+/* ── Admin Overview Chart ── */
+let adminChart=null;
+const adminOverviewState = {conferences:[], papers:[], users:[], reviews:[]};
+
+function buildChartSeries(type){
+  const submissions = adminOverviewState.papers.map(p => p.submitted_at ? new Date(p.submitted_at).getMonth() : 0);
+  const labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul'];
+  const baseSubmissions = [6,9,8,14,11,16,12];
+  const baseAccepted = [3,5,4,8,7,10,8];
+  const baseUsers = [12,18,10,24,20,28,16];
+  const baseConf = [2,2,3,3,4,4,4];
+
+  const datasets = {
+    submissions:[{label:'Submissions',data: baseSubmissions,backgroundColor:'rgba(91,61,246,.7)',borderRadius:6},{label:'Accepted',data: baseAccepted,backgroundColor:'rgba(0,200,150,.7)',borderRadius:6}],
+    users:[{label:'New Users',data: baseUsers,backgroundColor:'rgba(255,107,74,.7)',borderRadius:6}],
+    conferences:[{label:'Active Conferences',data: baseConf,backgroundColor:'rgba(245,166,35,.7)',borderRadius:6}],
+  };
+  return {labels, datasets: datasets[type] || datasets.submissions};
+}
+
+function renderAdminChart(){
+  const canvas=document.getElementById("adminChart"); if(!canvas) return;
+  if(adminChart){adminChart.destroy();adminChart=null;}
+  const isDark=document.documentElement.getAttribute("data-theme")==="dark";
+  const gc=isDark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)";
+  const tc=isDark?"#9d96c8":"#5b5484";
+  const series = buildChartSeries('submissions');
+  adminChart=new Chart(canvas.getContext("2d"),{
+    type:"bar",
+    data:{labels: series.labels, datasets: series.datasets},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:tc,font:{size:11}}},tooltip:{backgroundColor:"#1a1040",padding:10,cornerRadius:10}},scales:{x:{grid:{color:gc},ticks:{color:tc}},y:{grid:{color:gc},ticks:{color:tc},beginAtZero:true}}}
+  });
+}
+
+function switchAdminChart(type,btn){
+  document.querySelectorAll(".ctab").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
+  if(!adminChart) return;
+  const series = buildChartSeries(type);
+  adminChart.data.labels = series.labels;
+  adminChart.data.datasets = series.datasets;
+  adminChart.update();
+}
+
+/* ── Trend Charts ── */
+let tc1=null,tc2=null,tc3=null,tc4=null;
+function buildTrendDataset(){
+  const papers = adminOverviewState.papers || [];
+  const conferences = adminOverviewState.conferences || [];
+  const accepted = papers.filter(p => String(p.status||'').toLowerCase() === 'accepted').length;
+  const rejected = papers.filter(p => String(p.status||'').toLowerCase() === 'rejected').length;
+  const pending = papers.filter(p => !['accepted','rejected'].includes(String(p.status||'').toLowerCase())).length;
+  const labels = conferences.length ? conferences.map(c => c.name || 'Conference') : ['AI Summit','IoTConf','SmartTech','NLP Summit'];
+  const vals = conferences.length ? conferences.map(c => Number(c.submissions || 0)) : [14,9,7,12];
+  const chart4Topics = ['AI/ML','IoT','NLP','Blockchain','Cloud','Robotics'];
+  const chart4Values = [Math.max(4, papers.filter(p => /ai|ml|learning|model/i.test(p.title||'')).length || 4), Math.max(4, papers.filter(p => /iot|sensor|network/i.test(p.title||'')).length || 4), Math.max(4, papers.filter(p => /nlp|language|text/i.test(p.title||'')).length || 4), Math.max(4, papers.filter(p => /blockchain|security|ledger/i.test(p.title||'')).length || 4), Math.max(4, papers.filter(p => /cloud|distributed|edge/i.test(p.title||'')).length || 4), Math.max(4, papers.filter(p => /robot|vision|control/i.test(p.title||'')).length || 4)];
+  return {labels, vals, accepted, rejected, pending, chart4Topics, chart4Values};
+}
+
+function renderTrendCharts(){
+  const isDark=document.documentElement.getAttribute("data-theme")==="dark";
+  const gc=isDark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)";
+  const tcol=isDark?"#9d96c8":"#5b5484";
+  const trend = buildTrendDataset();
+
+  if(tc1){tc1.destroy();tc1=null;}
+  tc1=new Chart(document.getElementById("trendChart1").getContext("2d"),{
+    type:"bar",
+    data:{labels: trend.labels, datasets:[{label:"Submissions",data:trend.vals,backgroundColor:["rgba(91,61,246,.7)","rgba(0,200,150,.7)","rgba(245,166,35,.7)","rgba(255,107,74,.7)"],borderRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{color:tcol}},y:{grid:{color:gc},ticks:{color:tcol},beginAtZero:true}}}
+  });
+
+  if(tc2){tc2.destroy();tc2=null;}
+  tc2=new Chart(document.getElementById("trendChart2").getContext("2d"),{
+    type:"doughnut",
+    data:{labels:["Accepted","Rejected","Pending"],datasets:[{data:[trend.accepted,trend.rejected,trend.pending],backgroundColor:["rgba(0,200,150,.8)","rgba(229,72,77,.8)","rgba(245,166,35,.8)"],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tcol,font:{size:11}},position:"bottom"}}}
+  });
+
+  if(tc3){tc3.destroy();tc3=null;}
+  tc3=new Chart(document.getElementById("trendChart3").getContext("2d"),{
+    type:"line",
+    data:{labels:["Jan","Feb","Mar","Apr","May","Jun","Jul"],datasets:[{label:"Submissions",data:[6,9,8,14,11,16,12],fill:true,borderColor:"#5b3df6",backgroundColor:"rgba(91,61,246,.1)",tension:.45,pointBackgroundColor:"#5b3df6",pointRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{color:tcol}},y:{grid:{color:gc},ticks:{color:tcol},beginAtZero:true}}}
+  });
+
+  if(tc4){tc4.destroy();tc4=null;}
+  tc4=new Chart(document.getElementById("trendChart4").getContext("2d"),{
+    type:"bar",
+    data:{labels:trend.chart4Topics,datasets:[{label:"Papers",data:trend.chart4Values,backgroundColor:"rgba(168,85,247,.7)",borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:"y",plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{color:tcol}},y:{grid:{color:gc},ticks:{color:tcol}}}}
+  });
+}
+
+window.addEventListener("load",()=>{ renderAdminChart(); });
+
+// ── Admin API helpers ──
+async function apiGet(path){
+  const res = await fetch(path,{credentials:'same-origin'});
+  if(!res.ok) throw new Error('Request failed');
+  return res.json();
+}
+async function apiPost(path, body){
+  const res = await fetch(path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!res.ok) throw new Error('Request failed');
+  return res.json();
+}
+
+// Conferences
+async function loadConferences(){
+  try{
+    const rows = await apiGet('/api/conferences');
+    const tbody = document.getElementById('confs-table');
+    if(!tbody) return;
+    tbody.innerHTML = rows.map(r=>{
+      const date = new Date(r.conf_date).toLocaleDateString();
+      const dl = new Date(r.deadline).toLocaleDateString();
+      return `<tr><td style="font-weight:600;">${escapeHtml(r.name)}</td><td style="color:var(--ink-2);font-size:.83rem;">${date}</td><td style="color:var(--ink-2);font-size:.83rem;">${escapeHtml(r.venue||'')}</td><td style="color:var(--rose);font-size:.82rem;font-weight:600;">${dl}</td><td style="font-weight:700;color:var(--violet);">${r.submissions||0}</td><td><button class="action-btn ab-violet" onclick="editConf(${r.id})">Edit</button> <button class="action-btn ab-red" onclick="deleteConf(${r.id})">Delete</button></td></tr>`;
+    }).join('\n');
+  }catch(e){ console.error(e); }
+}
+
+async function createConference(){
+  const name = document.getElementById('conf-name').value.trim();
+  const conf_date = document.getElementById('conf-date').value;
+  const deadline = document.getElementById('conf-deadline').value;
+  const venue = document.getElementById('conf-venue').value.trim();
+  const description = document.getElementById('conf-desc').value.trim();
+  if(!name||!conf_date||!deadline){ showToast('Please fill name, date and deadline'); return; }
+  try{
+    await apiPost('/api/conferences',{name,venue,conf_date,deadline,description});
+    showToast('Conference created ✅');
+    showPage('conferences');
+    await loadConferences();
+  }catch(err){ showToast('Failed to create conference'); console.error(err); }
+}
+
+function editConf(id){ showToast('Edit not implemented yet'); }
+async function deleteConf(id){ if(!confirm('Delete conference?')) return; try{ await fetch(`/api/conferences/${id}`,{method:'DELETE',credentials:'same-origin'}); showToast('Deleted'); loadConferences(); }catch(e){showToast('Delete failed');}}
+
+// Users
+async function loadUsers(){
+  try{
+    const rows = await apiGet('/api/users');
+    const tbody = document.getElementById('users-table');
+    if(!tbody) return;
+    tbody.innerHTML = rows.map(u=>`<tr><td style="font-weight:600;">${escapeHtml(u.name)}</td><td style="color:var(--ink-2);">${escapeHtml(u.email)}</td><td><span class="badge ${u.role==='reviewer'?'badge-review':u.role==='admin'?'badge-accepted':'badge-submitted'}">${escapeHtml(u.role)}</span></td><td style="color:var(--ink-2);font-size:.83rem;">${escapeHtml(u.college||'')}</td><td style="color:var(--ink-3);font-size:.82rem;">${u.created_at||''}</td><td><button class="action-btn ab-red" onclick="removeUser(${u.id})">Remove</button></td></tr>`).join('\n');
+  }catch(e){ console.error(e); }
+}
+
+// Reviewers list for admin page
+async function loadReviewers(){
+  try{
+    const rows = await apiGet('/api/users');
+    const revs = rows.filter(u=>u.role==='reviewer');
+    const tbody = document.getElementById('reviewers-table');
+    if(!tbody) return;
+    tbody.innerHTML = revs.map(r=>`<tr><td style="font-weight:600;">${escapeHtml(r.name)}</td><td style="color:var(--ink-2);">${escapeHtml(r.email)}</td><td style="font-weight:700;color:var(--violet);">${r.assigned||0}</td><td style="font-weight:700;color:var(--teal);">${r.completed||0}</td><td style="font-weight:700;">${r.avg_score||'—'}</td><td><span class="badge ${r.active?'badge-accepted':'badge-review'}">${r.active?'Active':'Busy'}</span></td></tr>`).join('\n');
+    // also populate assign modal select if present
+    const sel = document.getElementById('assign-reviewer-select');
+    if(sel){
+      sel.innerHTML = '<option value="">(select reviewer)</option>' + revs.map(r=>`<option value="${r.id}">${escapeHtml(r.name)} — ${escapeHtml(r.email)}</option>`).join('\n');
+    }
+  }catch(e){ console.error(e); }
+}
+
+async function addUser(defaultRole='author'){
+  const name = prompt('Full name'); if(!name) return;
+  const email = prompt('Email'); if(!email) return;
+  const password = prompt('Password (min 6 chars)'); if(!password) return;
+  let role = defaultRole;
+  if(!role) role = prompt('Role (author/reviewer/admin)','author');
+  try{
+    await apiPost('/api/register',{name,email,password,role});
+    showToast('User created ✅');
+    await loadUsers();
+    await loadReviewers();
+  }catch(e){ showToast('Create user failed'); console.error(e); }
+}
+
+async function removeUser(id){ if(!confirm('Remove user?')) return; try{ await fetch(`/api/users/${id}`,{method:'DELETE',credentials:'same-origin'}); showToast('Removed'); await loadUsers(); }catch(e){showToast('Remove failed');}}
+
+// Reviews / publish
+async function loadReviews(){
+  try{
+    const rows = await apiGet('/api/reviews');
+    const tbody = document.querySelector('#page-results table tbody');
+    if(!tbody) return;
+    tbody.innerHTML = rows.map(r=>`<tr><td style="font-weight:600;">${escapeHtml(r.paper_title||'')}</td><td>${escapeHtml(r.reviewer_name||'')}</td><td><span style="font-weight:700;color:var(--teal);">${escapeHtml(String(r.score||''))}</span></td><td>${escapeHtml(r.decision||'')}</td><td><span class="badge ${r.published?'badge-accepted':'badge-submitted'}">${r.published?'Published':'Pending'}</span></td><td><button class="action-btn ${r.published?'ab-violet':'ab-green'}" onclick="publishReview(${r.id})">${r.published?'Republish':'Publish'}</button></td></tr>`).join('\n');
+  }catch(e){ console.error(e); }
+}
+
+async function publishReview(id){ if(!confirm('Publish this review?')) return; try{ const res = await fetch(`/api/reviews/${id}/publish`,{method:'PUT',credentials:'same-origin'}); if(!res.ok) throw new Error('fail'); showToast('Published ✅'); loadReviews(); }catch(e){ showToast('Publish failed'); console.error(e); }}
+
+function getRelativeTime(dateValue){
+  if(!dateValue) return 'just now';
+  const diff = Date.now() - new Date(dateValue).getTime();
+  const mins = Math.max(1, Math.floor(diff / 60000));
+  if(mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  if(hrs < 24) return `${hrs} hour${hrs > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days} day${days > 1 ? 's' : ''} ago`;
+}
+
+function renderOverviewStats(conferences=[], papers=[], users=[], reviews=[]){
+  const totalConferences = conferences.length;
+  const activeConferences = conferences.filter(c => (c.status || 'active') !== 'archived').length;
+  const pendingPaperCount = papers.filter(p => !['accepted','rejected'].includes(String(p.status||'').toLowerCase())).length;
+  const recentUsers = users.filter(u => {
+    const ts = new Date(u.created_at || 0).getTime();
+    return ts && (Date.now() - ts) <= 7 * 24 * 60 * 60 * 1000;
+  }).length;
+
+  const confEl = document.getElementById('overview-conferences-count');
+  const confSub = document.getElementById('overview-conferences-sub');
+  if(confEl) confEl.textContent = String(totalConferences).padStart(2, '0');
+  if(confSub) confSub.textContent = `${activeConferences} active`;
+
+  const paperEl = document.getElementById('overview-papers-count');
+  const paperSub = document.getElementById('overview-papers-sub');
+  if(paperEl) paperEl.textContent = String(papers.length).padStart(2, '0');
+  if(paperSub) paperSub.textContent = `${papers.filter(p => { const d = new Date(p.submitted_at || 0).getTime(); return d && (Date.now() - d) <= 7 * 24 * 60 * 60 * 1000; }).length} this week`;
+
+  const pendingEl = document.getElementById('overview-pending-count');
+  const pendingSub = document.getElementById('overview-pending-sub');
+  if(pendingEl) pendingEl.textContent = String(pendingPaperCount).padStart(2, '0');
+  if(pendingSub) pendingSub.textContent = pendingPaperCount ? 'Needs action' : 'Clear';
+
+  const usersEl = document.getElementById('overview-users-count');
+  const usersSub = document.getElementById('overview-users-sub');
+  if(usersEl) usersEl.textContent = String(users.length).padStart(2, '0');
+  if(usersSub) usersSub.textContent = `${recentUsers} new`;
+
+  const totalPapersBadge = document.querySelector('.nav-item[onclick*="papers"] .nav-badge');
+  if(totalPapersBadge) totalPapersBadge.textContent = String(papers.length);
+}
+
+function renderRecentSubmissions(papers=[]){
+  const tbody = document.getElementById('recent-submissions-body');
+  if(!tbody) return;
+  const items = papers.slice(0,4).map(p => {
+    const status = String(p.status || 'submitted').toLowerCase();
+    const badgeClass = status === 'accepted' ? 'badge-accepted' : status === 'rejected' ? 'badge-rejected' : status === 'under_review' ? 'badge-review' : 'badge-submitted';
+    const action = status === 'accepted' ? 'Publish' : 'Assign';
+    const btnClass = status === 'accepted' ? 'ab-green' : 'ab-violet';
+    return `<tr><td style="font-weight:600;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.title || '')}</td><td style="color:var(--ink-2);">${escapeHtml(p.author_name || p.author || 'Unknown')}</td><td><span class="badge ${badgeClass}">${escapeHtml(status.replace('_',' '))}</span></td><td><button class="action-btn ${btnClass}" onclick="showPage('papers')">${action}</button></td></tr>`;
+  });
+  tbody.innerHTML = items.join('\n') || '<tr><td colspan="4" style="color:var(--ink-3);">No recent submissions</td></tr>';
+}
+
+function renderActiveConferences(conferences=[]){
+  const tbody = document.getElementById('active-conferences-body');
+  if(!tbody) return;
+  tbody.innerHTML = conferences.slice(0,4).map(c => `<tr><td style="font-weight:600;">${escapeHtml(c.name || '')}</td><td style="font-size:.82rem;color:var(--ink-2);">${new Date(c.deadline || c.conf_date || Date.now()).toLocaleDateString()}</td><td><span style="font-weight:700;color:var(--violet);">${Number(c.submissions || 0)}</span></td></tr>`).join('\n') || '<tr><td colspan="3" style="color:var(--ink-3);">No conferences found</td></tr>';
+}
+
+async function loadNotifications(){
+  const list = document.getElementById('admin-notification-list');
+  if(!list) return;
+  try{
+    const rows = await apiGet('/api/notifications');
+    list.innerHTML = (rows || []).slice(0, 6).map(n => `
+      <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">
+        <div style="width:8px;height:8px;border-radius:50%;background:${n.is_read ? 'var(--border)' : 'var(--violet)'};flex-shrink:0;margin-top:5px;"></div>
+        <div>
+          <div style="font-size:.85rem;color:${n.is_read ? 'var(--ink-2)' : 'var(--ink)'};">${escapeHtml(n.message || 'Notification')}</div>
+          <div style="font-size:.72rem;color:var(--ink-3);margin-top:3px;">${getRelativeTime(n.created_at)}</div>
+        </div>
+      </div>
+    `).join('\n') || '<div style="color:var(--ink-3);padding:8px 0;">No notifications yet.</div>';
+    const badge = document.querySelector('.notif-badge');
+    const unread = (rows || []).filter(r => !r.is_read).length;
+    if(badge){ badge.textContent = unread ? String(unread) : ''; badge.style.display = unread ? 'inline-block' : 'none'; }
+  }catch(e){ console.error('Failed to load notifications', e); }
+}
+
+async function markAllNotificationsRead(){
+  try{
+    const rows = await apiGet('/api/notifications');
+    await Promise.all((rows||[]).filter(r => !r.is_read).map(r => fetch(`/api/notifications/${r.id}/read`, {method:'PUT', credentials:'same-origin'})));
+    await loadNotifications();
+    showToast('All notifications marked read');
+  }catch(e){ console.error(e); showToast('Could not update notifications'); }
+}
+
+async function refreshAdminDashboardData(){
+  try{
+    const [conferences, papers, users, reviews] = await Promise.all([
+      apiGet('/api/conferences'),
+      apiGet('/api/papers'),
+      apiGet('/api/users'),
+      apiGet('/api/reviews')
+    ]);
+    adminOverviewState.conferences = conferences || [];
+    adminOverviewState.papers = papers || [];
+    adminOverviewState.users = users || [];
+    adminOverviewState.reviews = reviews || [];
+
+    renderOverviewStats(adminOverviewState.conferences, adminOverviewState.papers, adminOverviewState.users, adminOverviewState.reviews);
+    renderRecentSubmissions(adminOverviewState.papers);
+    renderActiveConferences(adminOverviewState.conferences);
+    loadNotifications();
+    renderAdminChart();
+    renderTrendCharts();
+    await loadConferences();
+    await loadUsers();
+    await loadReviews();
+    await loadReviewers();
+    if(typeof loadPapers === 'function') await loadPapers();
+  }catch(e){ console.error('Dashboard refresh failed', e); }
+}
+
+// small helpers
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// initial load for admin views
+window.addEventListener('load', async ()=>{ try{ await refreshAdminDashboardData();
+    setInterval(async ()=>{ try{ await refreshAdminDashboardData(); }catch(e){console.error('Periodic refresh failed',e);} }, 10000);
+
+      try{
+        (function setupNotificationsSSE(){
+          try{
+            const es = new EventSource('/events/notifications');
+            es.onmessage = (e) => {
+              try{
+                const data = JSON.parse(e.data);
+                const badge = document.querySelector('.notif-badge');
+                if(badge){ badge.style.display = 'inline-block'; }
+                const pn = document.getElementById('page-notifications');
+                if(pn && pn.style.display !== 'none'){
+                  const container = pn.querySelector('.panel-body');
+                  if(container){
+                    const node = document.createElement('div');
+                    node.style.display='flex'; node.style.gap='12px'; node.style.padding='12px 0'; node.style.borderBottom='1px solid var(--border)';
+                    node.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:var(--violet);flex-shrink:0;margin-top:5px;"></div><div><div style="font-size:.85rem;color:var(--ink);">${escapeHtml(data.message || data.data || 'New update')}</div><div style="font-size:.72rem;color:var(--ink-3);margin-top:3px;">just now</div></div>`;
+                    container.prepend(node);
+                  }
+                }
+                loadNotifications();
+                refreshAdminDashboardData();
+              }catch(err){ console.error('SSE parse error', err); }
+            };
+            es.onerror = (err) => { console.error('SSE error', err); try{ es.close(); }catch(e){}; setTimeout(setupNotificationsSSE, 5000); };
+          }catch(e){ console.error('SSE init failed', e); setTimeout(setupNotificationsSSE, 5000); }
+        })();
+      }catch(e){ console.error('SSE setup outer', e); }
+
+  }catch(e){console.error(e);} });
+
+async function loadPapers(){
+  try{
+    const rows = await apiGet('/api/papers');
+    const tbody = document.querySelector('#page-papers table tbody');
+    if(!tbody) return;
+    tbody.innerHTML = rows.map(p=>{
+      const submitted = p.submitted_at ? new Date(p.submitted_at).toLocaleDateString() : '';
+      const status = (p.status||'submitted');
+      const reviewer = p.reviewer_name||'—';
+      return `<tr><td style="font-weight:600;">${escapeHtml(p.title||'')}</td><td>${escapeHtml(p.author_name||p.author||'')}</td><td style="color:var(--ink-2);font-size:.83rem;">${escapeHtml(p.conference_name||'')}</td><td style="color:var(--ink-3);font-size:.82rem;">${submitted}</td><td><span class="badge ${status==='accepted'?'badge-accepted':status==='rejected'?'badge-rejected':status==='under_review'?'badge-review':'badge-submitted'}">${escapeHtml(status)}</span></td><td style="font-size:.82rem;color:var(--ink-2);">${escapeHtml(reviewer)}</td><td><button class="action-btn ab-violet" onclick='openAssignModal(${p.id}, ${JSON.stringify(p.title||'')})'>Assign</button></td></tr>`;
+    }).join('\n');
+  }catch(e){ console.error(e); }
+}
+
+async function assignReviewer(paperId, paperTitle){
+  try{
+    const users = await apiGet('/api/users');
+    const reviewers = users.filter(u=>u.role==='reviewer');
+    if(!reviewers.length){ alert('No reviewers available'); return; }
+    let list = 'Select reviewer id from list:\n\n';
+    reviewers.forEach(r=> list += `${r.id}: ${r.name} <${r.email}>\n`);
+    const val = prompt(list + '\nEnter reviewer id:');
+    if(!val) return;
+    const rid = parseInt(val,10);
+    if(!reviewers.find(r=>r.id===rid)){ alert('Invalid reviewer id'); return; }
+    await apiPost('/api/assignments',{paper_id: paperId, reviewer_id: rid});
+    showToast('Reviewer assigned ✅');
+    await loadPapers();
+  }catch(e){ console.error(e); showToast('Assign failed'); }
+}
+
+// --- Assign modal handlers ---
+function openAssignModal(paperId, paperTitle){
+  const modal = document.getElementById('assign-modal');
+  if(!modal) return;
+  document.getElementById('assign-modal-paper-id').value = paperId;
+  document.getElementById('assign-modal-paper-title').textContent = paperTitle || '';
+  // ensure reviewer list is loaded
+  loadReviewers().then(()=>{
+    modal.style.display = 'block';
+    document.getElementById('assign-reviewer-select').focus();
+  }).catch(()=>{ modal.style.display='block'; });
+}
+
+async function confirmAssign(){
+  const sel = document.getElementById('assign-reviewer-select');
+  const pid = document.getElementById('assign-modal-paper-id').value;
+  if(!sel || !pid) return showToast('Assign failed');
+  const rid = parseInt(sel.value,10);
+  if(!rid) return showToast('Please select a reviewer');
+  try{
+    const res = await apiPost('/api/assignments',{paper_id: parseInt(pid,10), reviewer_id: rid});
+    console.log('assign response', res);
+    showToast('Reviewer assigned ✅');
+    closeAssignModal();
+    await loadPapers();
+    await loadReviewers();
+  }catch(e){ console.error(e); showToast('Assign failed'); }
+}
+
+function closeAssignModal(){ const modal=document.getElementById('assign-modal'); if(modal) modal.style.display='none'; }
+</script>
+<!-- Assign modal -->
+<div id="assign-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:9999;">
+  <div style="background:var(--card);border:1px solid var(--border);padding:18px;border-radius:12px;max-width:520px;margin:0 auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div style="font-weight:700;">Assign Reviewer</div>
+      <button onclick="closeAssignModal()" style="border:none;background:none;cursor:pointer;font-size:18px;">✖</button>
+    </div>
+    <div style="margin-bottom:8px;color:var(--ink-2);">Paper: <span id="assign-modal-paper-title" style="font-weight:600;color:var(--ink);"></span></div>
+    <input type="hidden" id="assign-modal-paper-id" value="">
+    <div style="margin-bottom:12px;"><select id="assign-reviewer-select" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--paper);"></select></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;"><button class="qbtn qbtn-ghost" onclick="closeAssignModal()">Cancel</button><button class="qbtn qbtn-teal" onclick="confirmAssign()">Assign Reviewer</button></div>
+  </div>
+</div>
+</body>
+</html>

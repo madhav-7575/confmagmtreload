@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS — Author Dashboard</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<script>(function(){const t=localStorage.getItem("cms_theme")||"light";const l=localStorage.getItem("cms_lang")||"en";document.documentElement.setAttribute("data-theme",t);document.documentElement.setAttribute("data-lang",l);})();</script>
+<style>
+/* ══ LAYOUT ══════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--paper);color:var(--ink);display:flex;flex-direction:column;min-height:100vh;transition:background .3s,color .3s;}
+
+/* ── Top bar ── */
+.topbar{
+  height:58px;background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;gap:12px;
+  position:sticky;top:0;z-index:200;
+  box-shadow:0 1px 8px rgba(91,61,246,.07);
+  transition:background .3s,border-color .3s;
+}
+.topbar-brand{font-family:"Fraunces",serif;font-weight:700;font-size:1.1rem;color:var(--violet);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.topbar-gem{width:28px;height:28px;background:linear-gradient(135deg,var(--violet),var(--coral));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem;box-shadow:0 3px 10px rgba(91,61,246,.3);}
+.topbar-search{flex:1;max-width:360px;position:relative;margin-left:24px;}
+.topbar-search input{width:100%;padding:8px 14px 8px 36px;border:1.5px solid var(--border);border-radius:999px;font-size:.85rem;background:var(--paper);color:var(--ink);transition:border-color .2s,background .3s;}
+.topbar-search input:focus{outline:none;border-color:var(--violet);background:var(--card);}
+.topbar-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-3);font-size:.9rem;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+
+/* Notification bell */
+.notif-btn{position:relative;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background .2s;}
+.notif-btn:hover{background:var(--violet-t);}
+.notif-badge{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--coral);border-radius:50%;border:2px solid var(--card);}
+
+/* Profile dropdown */
+.profile-btn{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 5px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;transition:background .2s;}
+.profile-btn:hover{background:var(--violet-t);}
+.profile-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--coral));display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#fff;font-weight:700;}
+.profile-name{font-size:.83rem;font-weight:600;color:var(--ink);}
+.profile-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border:1px solid var(--border-2);border-radius:14px;padding:6px;min-width:190px;box-shadow:0 12px 40px rgba(0,0,0,.12);display:none;z-index:999;animation:dropIn .18s ease;}
+.profile-dropdown.open{display:block;}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.profile-menu-header{padding:10px 12px;border-bottom:1px solid var(--border);margin-bottom:4px;}
+.profile-menu-name{font-weight:700;font-size:.9rem;color:var(--ink);}
+.profile-menu-role{font-size:.75rem;color:var(--ink-2);margin-top:2px;text-transform:capitalize;}
+.profile-menu-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:.85rem;color:var(--ink);cursor:pointer;border:none;background:none;width:100%;text-align:left;text-decoration:none;transition:background .15s;}
+.profile-menu-item:hover{background:var(--violet-t2);}
+.profile-menu-item.danger{color:var(--rose);}
+.profile-menu-item.danger:hover{background:var(--rose-t);}
+.profile-menu-sep{height:1px;background:var(--border);margin:4px 0;}
+
+/* Lang + theme controls */
+.ctrl-btn{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;font-size:.8rem;font-weight:600;color:var(--ink-2);transition:all .18s;}
+.ctrl-btn:hover{background:var(--violet-t);border-color:var(--border-2);color:var(--violet-d);}
+.theme-pill{display:flex;align-items:center;gap:0;background:var(--border);border-radius:999px;padding:3px;border:1px solid var(--border-2);cursor:pointer;transition:background .3s;}
+.theme-pill-track{width:44px;height:22px;position:relative;}
+.theme-pill-thumb{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:0;left:0;box-shadow:0 1px 4px rgba(0,0,0,.18);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center;font-size:.65rem;}
+[data-theme="dark"] .theme-pill-thumb{transform:translateX(22px);}
+[data-theme="dark"] .theme-pill{background:#1e1640;border-color:#3d3570;}
+.theme-sun,.theme-moon{position:absolute;top:50%;transform:translateY(-50%);font-size:.6rem;pointer-events:none;}
+.theme-sun{left:4px;}.theme-moon{right:4px;}
+
+/* Lang dropdown */
+.lang-wrap{position:relative;}
+.lang-drop{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border:1px solid var(--border-2);border-radius:14px;padding:6px;min-width:180px;box-shadow:0 12px 40px rgba(0,0,0,.12);display:none;z-index:1000;animation:dropIn .18s ease;}
+.lang-drop.open{display:block;}
+.lang-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:500;color:var(--ink);border:none;background:none;width:100%;text-align:left;transition:background .15s;}
+.lang-item:hover{background:var(--violet-t2);}
+.lang-item.active{background:var(--violet-t);color:var(--violet-d);font-weight:700;}
+.lang-item .lcheck{margin-left:auto;display:none;color:var(--violet);}
+.lang-item.active .lcheck{display:block;}
+
+/* ══ SHELL ═══════════════════════════════════════════════ */
+.shell{display:flex;flex:1;overflow:hidden;}
+
+/* ── Sidebar ── */
+.sidebar{
+  width:220px;flex-shrink:0;
+  background:var(--card);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:16px 0;overflow-y:auto;
+  transition:background .3s,border-color .3s,width .3s;
+  position:sticky;top:58px;height:calc(100vh - 58px);
+}
+.sidebar-section-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);padding:10px 18px 4px;margin-top:6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;margin:1px 8px;border-radius:10px;cursor:pointer;font-size:.875rem;font-weight:500;color:var(--ink-2);text-decoration:none;border:none;background:none;width:calc(100% - 16px);text-align:left;transition:background .18s,color .18s;}
+.nav-item:hover{background:var(--violet-t2);color:var(--ink);}
+.nav-item.active{background:var(--violet-t);color:var(--violet-d);font-weight:700;}
+.nav-item .nav-icon{width:20px;text-align:center;font-size:1rem;flex-shrink:0;}
+.nav-item .nav-badge{margin-left:auto;background:var(--coral);color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:999px;}
+.sidebar-bottom{margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--border);}
+
+/* ── Main content ── */
+.main{flex:1;overflow-y:auto;padding:28px 28px 40px;}
+
+/* ══ PAGE COMPONENTS ════════════════════════════════════ */
+
+/* Greeting */
+.greeting-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.greeting-text h2{font-family:"Fraunces",serif;font-size:1.6rem;font-weight:700;margin-bottom:4px;}
+.greeting-text p{color:var(--ink-2);font-size:.9rem;}
+.greeting-actions{display:flex;gap:8px;}
+
+/* Stat cards */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-c{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;cursor:default;transition:transform .2s,box-shadow .2s,background .3s,border-color .3s;}
+.stat-c:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(91,61,246,.1);}
+.stat-c-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:10px;}
+.stat-c-num{font-family:"Fraunces",serif;font-size:2rem;font-weight:800;line-height:1;}
+.stat-c-sub{font-size:.75rem;color:var(--ink-2);margin-top:6px;}
+.stat-c-icon{position:absolute;right:16px;top:16px;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.stat-c-glow{position:absolute;width:80px;height:80px;border-radius:50%;opacity:.1;bottom:-20px;right:-10px;}
+.sv .stat-c-num{color:var(--violet);} .sv .stat-c-icon{background:var(--violet-t);} .sv .stat-c-glow{background:var(--violet);}
+.sg .stat-c-num{color:var(--teal);}   .sg .stat-c-icon{background:var(--teal-t);}   .sg .stat-c-glow{background:var(--teal);}
+.sa .stat-c-num{color:var(--amber);}  .sa .stat-c-icon{background:var(--amber-t);}  .sa .stat-c-glow{background:var(--amber);}
+.sc .stat-c-num{color:var(--coral);}  .sc .stat-c-icon{background:var(--coral-t);}  .sc .stat-c-glow{background:var(--coral);}
+
+/* Two-col grid */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+
+/* Panel */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:background .3s,border-color .3s;}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.panel-head h3{font-family:"Fraunces",serif;font-size:1rem;font-weight:700;}
+.panel-head a{font-size:.78rem;font-weight:600;color:var(--violet);text-decoration:none;}
+.panel-head a:hover{text-decoration:underline;}
+.panel-body{padding:16px 20px;}
+
+/* Paper list items */
+.paper-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.paper-item:last-child{border-bottom:none;}
+.paper-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.paper-info{flex:1;min-width:0;}
+.paper-title{font-size:.85rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.paper-conf{font-size:.75rem;color:var(--ink-2);margin-top:2px;}
+
+/* Event cards */
+.event-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.event-item:last-child{border-bottom:none;}
+.event-date-box{flex-shrink:0;width:44px;height:44px;border-radius:10px;background:var(--violet-t);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.event-day{font-family:"Fraunces",serif;font-size:1.1rem;font-weight:800;color:var(--violet);line-height:1;}
+.event-month{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--violet-d);}
+.event-info{flex:1;min-width:0;}
+.event-name{font-size:.85rem;font-weight:600;color:var(--ink);}
+.event-loc{font-size:.75rem;color:var(--ink-2);margin-top:3px;display:flex;align-items:center;gap:4px;}
+
+/* Chart area */
+.chart-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:18px;overflow:hidden;transition:background .3s,border-color .3s;}
+.chart-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.chart-head h3{font-family:"Fraunces",serif;font-size:1rem;font-weight:700;}
+.chart-tabs{display:flex;gap:4px;}
+.ctab{padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:none;font-size:.75rem;font-weight:600;color:var(--ink-2);cursor:pointer;transition:all .18s;}
+.ctab.active,.ctab:hover{background:var(--violet-t);border-color:var(--border-2);color:var(--violet-d);}
+.chart-body{padding:20px;}
+canvas{width:100%!important;}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700;border:1px solid transparent;}
+.badge-submitted{background:#ede9ff;color:#4f2dcc;border-color:#c8baff;}
+.badge-review{background:var(--amber-t);color:#9a6510;border-color:#f5d080;}
+.badge-accepted{background:var(--teal-t);color:#0a7a5a;border-color:#6ddbb9;}
+.badge-rejected{background:var(--rose-t);color:#b91c1c;border-color:#fcb5b7;}
+
+/* Profile page */
+.profile-hero{background:linear-gradient(135deg,var(--violet-dd),var(--violet),#7c3aed);border-radius:20px;padding:32px;color:#fff;position:relative;overflow:hidden;margin-bottom:24px;}
+.profile-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle 200px at 80% 50%,rgba(255,107,74,.25),transparent 70%);}
+.profile-hero-content{position:relative;z-index:2;display:flex;align-items:center;gap:20px;}
+.profile-big-avatar{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:#fff;flex-shrink:0;}
+.profile-hero-info h2{font-family:"Fraunces",serif;font-size:1.5rem;margin-bottom:4px;}
+.profile-hero-info p{opacity:.8;font-size:.9rem;}
+.profile-hero-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.profile-hero-badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:600;}
+.profile-edit-btn{margin-left:auto;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;padding:9px 18px;border-radius:999px;cursor:pointer;font-size:.85rem;font-weight:600;transition:background .2s;flex-shrink:0;}
+.profile-edit-btn:hover{background:rgba(255,255,255,.3);}
+
+/* Certificate card */
+.cert-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;transition:transform .2s,box-shadow .2s,background .3s;}
+.cert-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(91,61,246,.1);}
+.cert-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--amber),var(--coral));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.cert-info{flex:1;min-width:0;}
+.cert-name{font-weight:700;font-size:.9rem;color:var(--ink);}
+.cert-conf{font-size:.78rem;color:var(--ink-2);margin-top:3px;}
+.cert-date{font-size:.72rem;color:var(--ink-3);margin-top:2px;}
+.cert-download{background:var(--violet-t);border:1px solid var(--border-2);color:var(--violet-d);font-size:.8rem;font-weight:700;padding:7px 14px;border-radius:999px;cursor:pointer;transition:background .2s;white-space:nowrap;}
+.cert-download:hover{background:#ddd5ff;}
+
+/* Quick action btn */
+.quick-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:999px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:transform .18s,box-shadow .18s;}
+.qb-primary{background:linear-gradient(135deg,var(--violet),var(--violet-d));color:#fff;box-shadow:0 4px 14px rgba(91,61,246,.28);}
+.qb-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(91,61,246,.36);}
+.qb-ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--border-2);}
+.qb-ghost:hover{background:var(--violet-t2);border-color:var(--violet);color:var(--violet-d);}
+
+/* Notification dot */
+.notif-list-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.notif-list-item:last-child{border-bottom:none;}
+.notif-dot-wrap{flex-shrink:0;margin-top:3px;}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--violet);}
+.notif-dot.read{background:var(--border);}
+.notif-text{flex:1;font-size:.84rem;color:var(--ink);line-height:1.5;}
+.notif-time{font-size:.72rem;color:var(--ink-3);margin-top:3px;}
+
+/* Page section heading */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-head h2{font-family:"Fraunces",serif;font-size:1.25rem;}
+
+/* Form card */
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:18px;transition:background .3s,border-color .3s;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-size:.8rem;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em;}
+.form-group input,.form-group textarea,.form-group select{padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:.88rem;font-family:inherit;color:var(--ink);background:var(--paper);transition:border-color .18s,background .3s;}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--violet);background:var(--card);box-shadow:0 0 0 3px rgba(91,61,246,.1);}
+.form-group textarea{resize:vertical;min-height:90px;line-height:1.6;}
+
+/* Active page title */
+.page-header{margin-bottom:24px;}
+.page-header h1{font-family:"Fraunces",serif;font-size:1.6rem;font-weight:700;margin-bottom:4px;}
+.page-header p{color:var(--ink-2);font-size:.9rem;}
+
+/* Responsive */
+@media(max-width:900px){.stats-row{grid-template-columns:1fr 1fr;}.two-col{grid-template-columns:1fr;}.sidebar{width:64px;}.sidebar .nav-item span:not(.nav-icon){display:none;}.sidebar .nav-badge{display:none;}.sidebar .sidebar-section-label{display:none;}}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr;}.topbar-search{display:none;}.main{padding:16px;}}
+
+/* Dark mode additions */
+[data-theme="dark"]{--ink:#e8e3ff;--ink-2:#9d96c8;--ink-3:#6b6489;--paper:#0d0b1a;--card:#16132a;--border:#2a2448;--border-2:#3d3570;--violet-t:#1e1640;--violet-t2:#18122e;--coral-t:#2a1410;--teal-t:#071f18;--amber-t:#1f1608;--rose-t:#1f0b0c;--violet-dd:#2c1c8f;}
+[data-theme="dark"] .topbar,[data-theme="dark"] .sidebar{background:#100e20;border-color:#2a2448;}
+[data-theme="dark"] .stat-c,[data-theme="dark"] .panel,[data-theme="dark"] .chart-panel,[data-theme="dark"] .form-card,.cert-card{background:#16132a;border-color:#2a2448;}
+[data-theme="dark"] .form-group input,[data-theme="dark"] .form-group textarea,[data-theme="dark"] .form-group select{background:#0f0d1e;border-color:#2a2448;color:#e8e3ff;}
+[data-theme="dark"] .profile-big-avatar{border-color:rgba(255,255,255,.3);}
+[data-theme="dark"] thead{background:linear-gradient(90deg,#1a1535,#201a3a);}
+[data-theme="dark"] .badge-submitted{background:#1e1640;color:#a78bfa;border-color:#3d3570;}
+[data-theme="dark"] .badge-review{background:#1f1608;color:#fbbf24;border-color:#3a2b10;}
+[data-theme="dark"] .badge-accepted{background:#071f18;color:#34d399;border-color:#0e3028;}
+[data-theme="dark"] .badge-rejected{background:#1f0b0c;color:#f87171;border-color:#3d1014;}
+</style>
+</head>
+<body>
+
+<!-- ════ TOP BAR ════════════════════════════════════════════ -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-gem">◈</div>
+    CMS
+  </div>
+
+  <div class="topbar-search">
+    <span class="topbar-search-icon">🔍</span>
+    <input type="text" placeholder="Search papers, conferences…" id="global-search">
+  </div>
+
+  <div class="topbar-right">
+    <!-- Lang -->
+    <div class="lang-wrap">
+      <button class="ctrl-btn" onclick="toggleLangDrop()" id="lang-ctrl-btn">🌐 <span id="lctrl-label">EN</span> ▾</button>
+      <div class="lang-drop" id="lang-ctrl-drop">
+        <button class="lang-item active" onclick="setLang('en')" data-lang="en">🇬🇧 English <span class="lcheck">✓</span></button>
+        <button class="lang-item" onclick="setLang('ta')" data-lang="ta">🇮🇳 தமிழ் <span class="lcheck">✓</span></button>
+        <button class="lang-item" onclick="setLang('hi')" data-lang="hi">🇮🇳 हिंदी <span class="lcheck">✓</span></button>
+        <button class="lang-item" onclick="setLang('fr')" data-lang="fr">🇫🇷 Français <span class="lcheck">✓</span></button>
+        <button class="lang-item" onclick="setLang('de')" data-lang="de">🇩🇪 Deutsch <span class="lcheck">✓</span></button>
+      </div>
+    </div>
+
+    <!-- Theme -->
+    <button class="theme-pill" onclick="toggleTheme()" title="Toggle theme">
+      <div class="theme-pill-track">
+        <span class="theme-sun">☀️</span>
+        <span class="theme-moon">🌙</span>
+        <div class="theme-pill-thumb">
+          <span id="theme-thumb-icon">☀️</span>
+        </div>
+      </div>
+    </button>
+
+    <!-- Notification -->
+    <button class="notif-btn" onclick="showPage('notifications')">
+      🔔<span class="notif-badge"></span>
+    </button>
+
+    <!-- Profile -->
+    <div class="lang-wrap">
+      <button class="profile-btn" onclick="toggleProfileDrop()">
+        <div class="profile-avatar" id="topbar-avatar">M</div>
+        <span class="profile-name" id="topbar-name">Madhav</span>
+        <span style="color:var(--ink-3);font-size:.7rem;">▾</span>
+      </button>
+      <div class="lang-drop" id="profile-drop" style="min-width:200px;">
+        <div class="profile-menu-header">
+          <div class="profile-menu-name" id="drop-name">Madhav Kumar</div>
+          <div class="profile-menu-role" id="drop-role">Author</div>
+        </div>
+        <a href="#" class="profile-menu-item" onclick="showPage('profile')">👤 My Profile</a>
+        <a href="#" class="profile-menu-item" onclick="showPage('certificates')">🎓 Certificates</a>
+        <a href="#" class="profile-menu-item" onclick="showPage('settings')">⚙️ Settings</a>
+        <div class="profile-menu-sep"></div>
+        <button class="profile-menu-item danger" onclick="handleLogout()">🚪 Logout</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ════ SHELL ═══════════════════════════════════════════════ -->
+<div class="shell">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-section-label">Dashboard</div>
+    <a class="nav-item active" href="#" onclick="showPage('overview')">
+      <span class="nav-icon">🏠</span><span>Overview</span>
+    </a>
+    <a class="nav-item" href="#" onclick="showPage('conferences')">
+      <span class="nav-icon">📅</span><span>Conferences</span>
+    </a>
+    <a class="nav-item" href="#" onclick="showPage('papers')">
+      <span class="nav-icon">📄</span><span>My Papers</span>
+    </a>
+    <a class="nav-item" href="#" onclick="showPage('certificates')">
+      <span class="nav-icon">🎓</span><span>Certificates</span>
+    </a>
+    <a class="nav-item" href="#" onclick="showPage('notifications')">
+      <span class="nav-icon">🔔</span><span>Notifications</span>
+      <span class="nav-badge">3</span>
+    </a>
+
+    <div class="sidebar-section-label">Quick Access</div>
+    <a class="nav-item" href="#" onclick="showPage('submit')">
+      <span class="nav-icon">＋</span><span>Submit Paper</span>
+    </a>
+    <a class="nav-item" href="#" onclick="showPage('conferences')">
+      <span class="nav-icon">🔭</span><span>Find Conference</span>
+    </a>
+
+    <div class="sidebar-bottom">
+      <a class="nav-item" href="#" onclick="showPage('profile')">
+        <span class="nav-icon">👤</span><span>Profile</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('settings')">
+        <span class="nav-icon">⚙</span><span>Settings</span>
+      </a>
+      <a class="nav-item danger" href="#" onclick="handleLogout()" style="color:var(--rose);">
+        <span class="nav-icon">🚪</span><span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- ════ OVERVIEW PAGE ═══════════════════════════════ -->
+    <div id="page-overview" class="page-view">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <h2 id="greeting-msg">Good morning, Madhav 👋</h2>
+          <p>Here's what's happening with your research.</p>
+        </div>
+        <div class="greeting-actions">
+          <a href="#" class="quick-btn qb-primary" onclick="showPage('submit')">＋ Submit Paper</a>
+          <a href="#" class="quick-btn qb-ghost" onclick="showPage('conferences')">📅 Find Conference</a>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-c sv">
+          <div class="stat-c-glow"></div>
+          <div class="stat-c-icon">📄</div>
+          <div class="stat-c-label">Papers</div>
+          <div class="stat-c-num">08</div>
+          <div class="stat-c-sub">Submitted</div>
+        </div>
+        <div class="stat-c sg">
+          <div class="stat-c-glow"></div>
+          <div class="stat-c-icon">✅</div>
+          <div class="stat-c-label">Accepted</div>
+          <div class="stat-c-num">03</div>
+          <div class="stat-c-sub">+1 this month</div>
+        </div>
+        <div class="stat-c sa">
+          <div class="stat-c-glow"></div>
+          <div class="stat-c-icon">⏳</div>
+          <div class="stat-c-label">Pending</div>
+          <div class="stat-c-num">02</div>
+          <div class="stat-c-sub">Under review</div>
+        </div>
+        <div class="stat-c sc">
+          <div class="stat-c-glow"></div>
+          <div class="stat-c-icon">📅</div>
+          <div class="stat-c-label">Events</div>
+          <div class="stat-c-num">04</div>
+          <div class="stat-c-sub">Upcoming</div>
+        </div>
+      </div>
+
+      <!-- Two columns -->
+      <div class="two-col">
+        <!-- My Submissions -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3>My Submissions</h3>
+            <a href="#" onclick="showPage('papers')">View All →</a>
+          </div>
+          <div class="panel-body">
+            <div id="my-submissions"></div>
+          </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Upcoming Events</h3>
+            <a href="#" onclick="showPage('conferences')">Browse →</a>
+          </div>
+          <div class="panel-body">
+            <div id="events-list">
+            <div class="event-item">
+              <div class="event-date-box">
+                <div class="event-day">24</div>
+                <div class="event-month">Sep</div>
+              </div>
+              <div class="event-info">
+                <div class="event-name">AI Summit 2026</div>
+                <div class="event-loc">📍 Chennai Trade Centre</div>
+                <div style="margin-top:6px;"><span class="badge badge-accepted">Registered</span></div>
+              </div>
+            </div>
+            </div>
+            <div class="event-item">
+              <div class="event-date-box" style="background:var(--coral-t);">
+                <div class="event-day" style="color:var(--coral);">12</div>
+                <div class="event-month" style="color:var(--coral-d);">Oct</div>
+              </div>
+              <div class="event-info">
+                <div class="event-name">Research Conference 2026</div>
+                <div class="event-loc">📍 NIMHANS · Bangalore</div>
+                <div style="margin-top:6px;"><span class="badge badge-review">Shortlisted</span></div>
+              </div>
+            </div>
+            <div class="event-item">
+              <div class="event-date-box" style="background:var(--amber-t);">
+                <div class="event-day" style="color:var(--amber);">05</div>
+                <div class="event-month" style="color:#9a6510;">Nov</div>
+              </div>
+              <div class="event-info">
+                <div class="event-name">IoT & Embedded Systems</div>
+                <div class="event-loc">📍 IIT Madras</div>
+                <div style="margin-top:6px;"><span class="badge badge-submitted">Open</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submission Activity Chart -->
+      <div class="chart-panel">
+        <div class="chart-head">
+          <h3>Submission Activity</h3>
+          <div class="chart-tabs">
+            <button class="ctab active" onclick="switchChart('submissions',this)">Submissions</button>
+            <button class="ctab" onclick="switchChart('status',this)">Status</button>
+          </div>
+        </div>
+        <div class="chart-body">
+          <canvas id="activityChart" height="90"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ MY PAPERS ════════════════════════════════════ -->
+    <div id="page-papers" class="page-view" style="display:none;">
+      <div class="page-header">
+        <h1>My Papers</h1>
+        <p>Track all your submitted research papers, review status, and certificates.</p>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="ctab active" onclick="filterPapersByStatus('all',this)">All</button>
+        <button class="ctab" onclick="filterPapersByStatus('accepted',this)">Accepted</button>
+        <button class="ctab" onclick="filterPapersByStatus('under_review',this)">Under Review</button>
+        <button class="ctab" onclick="filterPapersByStatus('submitted',this)">Submitted</button>
+        <a href="#" class="quick-btn qb-primary" onclick="showPage('submit')" style="margin-left:auto;">＋ New Submission</a>
+      </div>
+      <div class="panel">
+        <div class="panel-body" style="padding:0;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead style="background:var(--violet-t2);">
+              <tr>
+                <th style="padding:12px 16px;text-align:left;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2);">Title</th>
+                <th style="padding:12px 16px;text-align:left;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2);">Conference</th>
+                <th style="padding:12px 16px;text-align:left;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2);">Submitted</th>
+                <th style="padding:12px 16px;text-align:left;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2);">Status</th>
+                <th style="padding:12px 16px;text-align:left;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2);">Certificate</th>
+              </tr>
+            </thead>
+            <tbody id="papers-table-body">
+              <tr style="border-bottom:1px solid var(--border);text-align:center;color:var(--ink-2);">
+                <td colspan="5" style="padding:28px 16px;">
+                  <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-direction:column;">
+                    <div style="font-size:2rem;opacity:.6;">📄</div>
+                    <div>Loading your papers...</div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Certificate Modal -->
+    <div id="cert-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9998;backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .3s ease;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <h2 style="font-family:'Fraunces',serif;font-size:1.3rem;margin:0;display:flex;align-items:center;gap:10px;">🎓 <span id="cert-modal-title">Certificate Details</span></h2>
+          <button onclick="closeCertModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--ink-2);">✕</button>
+        </div>
+        <div style="border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:16px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:.85rem;">
+            <div>
+              <div style="color:var(--ink-2);font-weight:600;margin-bottom:4px;">Conference Name</div>
+              <div style="color:var(--ink);font-weight:700;font-size:.95rem;" id="cert-modal-conf">—</div>
+            </div>
+            <div>
+              <div style="color:var(--ink-2);font-weight:600;margin-bottom:4px;">Conference Date</div>
+              <div style="color:var(--ink);font-weight:700;font-size:.95rem;" id="cert-modal-date">—</div>
+            </div>
+          </div>
+        </div>
+        <div style="border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:16px;">
+          <div style="color:var(--ink-2);font-weight:600;margin-bottom:8px;font-size:.85rem;">Paper Title</div>
+          <div style="color:var(--ink);font-weight:600;font-size:.95rem;line-height:1.5;" id="cert-modal-paper">—</div>
+        </div>
+        <div style="border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:16px;">
+          <div style="color:var(--ink-2);font-weight:600;margin-bottom:8px;font-size:.85rem;">Venue & Location</div>
+          <div style="color:var(--ink);font-weight:500;font-size:.9rem;" id="cert-modal-venue">—</div>
+        </div>
+        <div style="border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:16px;">
+          <div style="color:var(--ink-2);font-weight:600;margin-bottom:8px;font-size:.85rem;">Certificate Type</div>
+          <div style="display:flex;gap:6px;">
+            <span id="cert-modal-type-badge" style="background:var(--violet-t);color:var(--violet-d);padding:4px 12px;border-radius:999px;font-size:.8rem;font-weight:600;">Acceptance</span>
+          </div>
+        </div>
+        <div style="border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:16px;">
+          <div style="color:var(--ink-2);font-weight:600;margin-bottom:8px;font-size:.85rem;">Issued Date</div>
+          <div style="color:var(--ink);font-weight:500;font-size:.9rem;" id="cert-modal-issued">—</div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="quick-btn qb-primary" style="flex:1;" onclick="downloadCertPDF()">📥 Download PDF</button>
+          <button class="quick-btn qb-ghost" onclick="closeCertModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ CERTIFICATES ════════════════════════════════ -->
+    <div id="page-certificates" class="page-view" style="display:none;">
+      <div class="page-header">
+        <h1>My Certificates</h1>
+        <p>Certificates awarded for accepted papers and conference participation.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;" id="cert-list">
+        <div class="cert-card">
+          <div class="cert-icon">🏆</div>
+          <div class="cert-info">
+            <div class="cert-name">Best Paper Award</div>
+            <div class="cert-conf">IoTConf 2026 — International IoT Conference</div>
+            <div class="cert-date">Issued: 15 March 2026</div>
+          </div>
+          <button class="cert-download" onclick="downloadCert('IoT Security Framework','IoTConf 2026')">⬇ Download PDF</button>
+        </div>
+        <div class="cert-card">
+          <div class="cert-icon">📜</div>
+          <div class="cert-info">
+            <div class="cert-name">Paper Acceptance Certificate</div>
+            <div class="cert-conf">NLP Summit 2025 — Natural Language Processing</div>
+            <div class="cert-date">Issued: 10 Dec 2025</div>
+          </div>
+          <button class="cert-download" onclick="downloadCert('Deep Learning in NLP','NLP Summit 2025')">⬇ Download PDF</button>
+        </div>
+        <div class="cert-card">
+          <div class="cert-icon">🎖</div>
+          <div class="cert-info">
+            <div class="cert-name">Participation Certificate</div>
+            <div class="cert-conf">AI Summit 2025 — Artificial Intelligence</div>
+            <div class="cert-date">Issued: 25 Sep 2025</div>
+          </div>
+          <button class="cert-download" onclick="downloadCert('Participation','AI Summit 2025')">⬇ Download PDF</button>
+        </div>
+      </div>
+
+      <!-- Certificate Preview -->
+      <div class="page-header" style="margin-top:28px;"><h1 style="font-size:1.2rem;">Certificate Preview</h1></div>
+      <canvas id="cert-canvas" width="900" height="620"
+        style="width:100%;border:1px solid var(--border);border-radius:16px;box-shadow:var(--sh-md);display:block;"></canvas>
+      <div style="margin-top:12px;display:flex;gap:10px;">
+        <button class="quick-btn qb-primary" onclick="renderCert('IoT Security Framework','IoTConf 2026','Madhav Kumar')">Preview Certificate</button>
+        <button class="quick-btn qb-ghost" onclick="saveCertPDF()">⬇ Save as PNG</button>
+      </div>
+    </div>
+
+    <!-- ════ PROFILE ══════════════════════════════════════ -->
+    <div id="page-profile" class="page-view" style="display:none;">
+      <div class="profile-hero">
+        <div class="profile-hero-content">
+          <div class="profile-big-avatar" id="profile-big-avatar">M</div>
+          <div class="profile-hero-info">
+            <h2 id="profile-hero-name">Madhav Kumar</h2>
+            <p id="profile-hero-email">madhav@university.edu</p>
+            <div class="profile-hero-badges">
+              <span class="profile-hero-badge">✍️ Author</span>
+              <span class="profile-hero-badge">🎓 3 Certificates</span>
+              <span class="profile-hero-badge">📄 8 Papers</span>
+            </div>
+          </div>
+          <button class="profile-edit-btn" onclick="toggleEditProfile()">✏️ Edit Profile</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="form-card">
+          <h3 style="font-family:'Fraunces',serif;margin-bottom:16px;">Personal Information</h3>
+          <div class="form-row" style="margin-bottom:14px;">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" value="Madhav Kumar" id="edit-name">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" value="madhav@university.edu" id="edit-email">
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:14px;">
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" value="+91 98765 43210" id="edit-phone">
+            </div>
+            <div class="form-group">
+              <label>Role</label>
+              <input type="text" value="Author" readonly style="background:var(--violet-t2);cursor:not-allowed;">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label>College / Organization</label>
+            <input type="text" value="IIT Madras, Chennai" id="edit-college">
+          </div>
+          <div class="form-group">
+            <label>Bio</label>
+            <textarea id="edit-bio">Researcher in AI and IoT systems. Published 8 papers in international conferences.</textarea>
+          </div>
+          <button class="quick-btn qb-primary" style="margin-top:14px;" onclick="saveProfile()">💾 Save Changes</button>
+        </div>
+
+        <div>
+          <div class="form-card" style="margin-bottom:14px;">
+            <h3 style="font-family:'Fraunces',serif;margin-bottom:16px;">Research Interests</h3>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;" id="interests-wrap">
+              <span style="background:var(--violet-t);color:var(--violet-d);padding:5px 14px;border-radius:999px;font-size:.8rem;font-weight:600;">Artificial Intelligence</span>
+              <span style="background:var(--teal-t);color:#0a7a5a;padding:5px 14px;border-radius:999px;font-size:.8rem;font-weight:600;">IoT Systems</span>
+              <span style="background:var(--coral-t);color:var(--coral-d);padding:5px 14px;border-radius:999px;font-size:.8rem;font-weight:600;">Machine Learning</span>
+              <span style="background:var(--amber-t);color:#9a6510;padding:5px 14px;border-radius:999px;font-size:.8rem;font-weight:600;">NLP</span>
+              <span style="background:var(--violet-t);color:var(--violet-d);padding:5px 14px;border-radius:999px;font-size:.8rem;font-weight:600;">Smart Cities</span>
+            </div>
+            <input type="text" placeholder="Add interest…" style="margin-top:12px;width:100%;padding:8px 12px;border:1.5px dashed var(--border-2);border-radius:10px;background:none;color:var(--ink);font-family:inherit;">
+          </div>
+
+          <div class="form-card">
+            <h3 style="font-family:'Fraunces',serif;margin-bottom:16px;">Account Statistics</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="background:var(--violet-t2);border-radius:12px;padding:14px;text-align:center;">
+                <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:800;color:var(--violet);">8</div>
+                <div style="font-size:.72rem;color:var(--ink-2);font-weight:600;margin-top:2px;">Papers</div>
+              </div>
+              <div style="background:var(--teal-t);border-radius:12px;padding:14px;text-align:center;">
+                <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:800;color:var(--teal);">3</div>
+                <div style="font-size:.72rem;color:var(--ink-2);font-weight:600;margin-top:2px;">Accepted</div>
+              </div>
+              <div style="background:var(--amber-t);border-radius:12px;padding:14px;text-align:center;">
+                <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:800;color:var(--amber);">3</div>
+                <div style="font-size:.72rem;color:var(--ink-2);font-weight:600;margin-top:2px;">Certificates</div>
+              </div>
+              <div style="background:var(--coral-t);border-radius:12px;padding:14px;text-align:center;">
+                <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:800;color:var(--coral);">4</div>
+                <div style="font-size:.72rem;color:var(--ink-2);font-weight:600;margin-top:2px;">Events</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ NOTIFICATIONS ════════════════════════════════ -->
+    <div id="page-notifications" class="page-view" style="display:none;">
+      <div class="page-header">
+        <h1>Notifications</h1>
+        <p>Stay updated on your papers, reviews, and conference news.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Recent</h3>
+          <a href="#" onclick="markAllRead()">Mark all read</a>
+        </div>
+        <div class="panel-body">
+          <div class="notif-list-item">
+            <div class="notif-dot-wrap"><div class="notif-dot"></div></div>
+            <div>
+              <div class="notif-text">Your paper <strong>IoT Security Framework</strong> has been <strong style="color:var(--teal);">accepted</strong> at IoTConf 2026.</div>
+              <div class="notif-time">2 hours ago</div>
+            </div>
+          </div>
+          <div class="notif-list-item">
+            <div class="notif-dot-wrap"><div class="notif-dot"></div></div>
+            <div>
+              <div class="notif-text">A reviewer has been assigned to <strong>AI in Healthcare Systems</strong>.</div>
+              <div class="notif-time">1 day ago</div>
+            </div>
+          </div>
+          <div class="notif-list-item">
+            <div class="notif-dot-wrap"><div class="notif-dot"></div></div>
+            <div>
+              <div class="notif-text">Your certificate for <strong>NLP Summit 2025</strong> is ready to download.</div>
+              <div class="notif-time">3 days ago</div>
+            </div>
+          </div>
+          <div class="notif-list-item">
+            <div class="notif-dot-wrap"><div class="notif-dot read"></div></div>
+            <div>
+              <div class="notif-text" style="color:var(--ink-2);">AI Summit 2026 submissions close on <strong>15 Sep 2026</strong>. Don't miss it.</div>
+              <div class="notif-time">1 week ago</div>
+            </div>
+          </div>
+          <div class="notif-list-item">
+            <div class="notif-dot-wrap"><div class="notif-dot read"></div></div>
+            <div>
+              <div class="notif-text" style="color:var(--ink-2);">Welcome to CMS! Complete your profile to get personalized recommendations.</div>
+              <div class="notif-time">2 weeks ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ CONFERENCES ══════════════════════════════════ -->
+    <div id="page-conferences" class="page-view" style="display:none;">
+      <div class="page-header">
+        <h1>Conferences</h1>
+        <p>Browse and discover open calls for papers.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;" id="conf-grid">
+        <!-- dynamically filled -->
+      </div>
+    </div>
+
+    <!-- ════ SUBMIT PAPER ════════════════════════════════ -->
+    <div id="page-submit" class="page-view" style="display:none;">
+      <div class="page-header">
+        <h1>Submit Paper</h1>
+        <p>Fill in the details and upload your research PDF.</p>
+      </div>
+      <div class="form-card">
+        <div class="form-row" style="margin-bottom:14px;">
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>Conference</label>
+            <select id="submit-conf-select">
+              <option value="">— Select a Conference —</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label>Paper Title</label>
+          <input type="text" placeholder="Full title of your research paper">
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label>Topic / Keywords</label>
+          <input type="text" placeholder="e.g. Machine Learning, NLP, Computer Vision">
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label>Abstract</label>
+          <textarea placeholder="Provide a concise summary (150–300 words)…"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label>Upload PDF</label>
+          <input type="file" accept="application/pdf" id="submit-file">
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px;">
+          <button class="quick-btn qb-primary" onclick="submitPaper()">Submit Paper →</button>
+          <button class="quick-btn qb-ghost" onclick="showPage('overview')">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ SETTINGS ════════════════════════════════════ -->
+    <div id="page-settings" class="page-view" style="display:none;">
+      <div class="page-header">
+        <h1>Settings</h1>
+        <p>Manage your preferences and account settings.</p>
+      </div>
+      <div class="two-col">
+        <div class="form-card">
+          <h3 style="font-family:'Fraunces',serif;margin-bottom:16px;">Appearance</h3>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div>
+              <div style="font-weight:600;font-size:.88rem;">Dark Mode</div>
+              <div style="font-size:.78rem;color:var(--ink-2);">Switch between light and dark theme</div>
+            </div>
+            <button class="theme-pill" onclick="toggleTheme()">
+              <div class="theme-pill-track">
+                <span class="theme-sun">☀️</span>
+                <span class="theme-moon">🌙</span>
+                <div class="theme-pill-thumb"><span>☀️</span></div>
+              </div>
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-weight:600;font-size:.88rem;">Language</div>
+              <div style="font-size:.78rem;color:var(--ink-2);">Choose your preferred language</div>
+            </div>
+            <select style="padding:7px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:.83rem;background:var(--paper);color:var(--ink);" onchange="setLang(this.value)">
+              <option value="en">🇬🇧 English</option>
+              <option value="ta">🇮🇳 தமிழ்</option>
+              <option value="hi">🇮🇳 हिंदी</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="de">🇩🇪 Deutsch</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-card">
+          <h3 style="font-family:'Fraunces',serif;margin-bottom:16px;">Notifications</h3>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <div><div style="font-weight:600;font-size:.88rem;">Paper Status Updates</div><div style="font-size:.78rem;color:var(--ink-2);">When review decision is made</div></div>
+              <input type="checkbox" checked style="width:auto;accent-color:var(--violet);">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <div><div style="font-weight:600;font-size:.88rem;">Conference Reminders</div><div style="font-size:.78rem;color:var(--ink-2);">Deadline alerts 7 days before</div></div>
+              <input type="checkbox" checked style="width:auto;accent-color:var(--violet);">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+              <div><div style="font-weight:600;font-size:.88rem;">Certificate Ready</div><div style="font-size:.78rem;color:var(--ink-2);">When new certificate is issued</div></div>
+              <input type="checkbox" checked style="width:auto;accent-color:var(--violet);">
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <h3 style="font-family:'Fraunces',serif;margin-bottom:16px;">Change Password</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" placeholder="••••••••">
+          </div>
+        </div>
+        <button class="quick-btn qb-primary" style="margin-top:10px;" onclick="showToast('Password updated ✅')">Update Password</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 22px;border-radius:999px;font-size:.85rem;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.25);opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:9999;white-space:nowrap;"></div>
+
+<script>
+/* ── Auth guard ── */
+const session = JSON.parse(localStorage.getItem("cms_session")||"null");
+if(!session || session.role !== "author"){
+  window.location.href = "login.html";
+} else {
+  document.getElementById("topbar-name").textContent = session.name.split(" ")[0];
+  document.getElementById("topbar-avatar").textContent = session.name[0];
+  document.getElementById("drop-name").textContent = session.name;
+  document.getElementById("profile-hero-name").textContent = session.name;
+  document.getElementById("profile-big-avatar").textContent = session.name[0];
+  document.getElementById("profile-hero-email").textContent = session.email || "";
+  const h = new Date().getHours();
+  const g = h<12?"Good morning":h<17?"Good afternoon":"Good evening";
+  document.getElementById("greeting-msg").textContent = `${g}, ${session.name.split(" ")[0]} 👋`;
+}
+async function logout(){
+  try{ await fetch('/api/logout',{method:'POST'}); }catch(e){}
+  localStorage.removeItem("cms_session"); window.location.href="login.html";
+}
+
+/* ── Theme ── */
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur==="dark"?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next);
+  localStorage.setItem("cms_theme",next);
+  updateThumbIcon();
+  showToast(next==="dark"?"Dark mode on 🌙":"Light mode on ☀️");
+}
+function updateThumbIcon(){
+  const isDark = document.documentElement.getAttribute("data-theme")==="dark";
+  document.querySelectorAll(".theme-pill-thumb span").forEach(s=>s.textContent=isDark?"🌙":"☀️");
+}
+updateThumbIcon();
+
+/* ── Lang ── */
+const langLabels={en:"EN",ta:"தமிழ்",hi:"हिंदी",fr:"FR",de:"DE"};
+function setLang(l){
+  document.documentElement.setAttribute("data-lang",l);
+  localStorage.setItem("cms_lang",l);
+  const lb = document.getElementById("lctrl-label");
+  if(lb) lb.textContent = langLabels[l]||l.toUpperCase();
+  document.querySelectorAll(".lang-item[data-lang]").forEach(el=>{
+    el.classList.toggle("active", el.dataset.lang===l);
+  });
+  closeDrop("lang-ctrl-drop");
+  showToast("Language updated");
+}
+function toggleLangDrop(){
+  const d=document.getElementById("lang-ctrl-drop");
+  d.classList.toggle("open");
+  document.getElementById("profile-drop")?.classList.remove("open");
+}
+function closeDrop(id){ document.getElementById(id)?.classList.remove("open"); }
+function toggleProfileDrop(){
+  const d=document.getElementById("profile-drop");
+  d.classList.toggle("open");
+  document.getElementById("lang-ctrl-drop")?.classList.remove("open");
+}
+document.addEventListener("click",e=>{
+  if(!e.target.closest(".lang-wrap")&&!e.target.closest("#lang-ctrl-btn")){
+    closeDrop("lang-ctrl-drop");
+    closeDrop("profile-drop");
+  }
+});
+
+/* ── Page switching ── */
+function showPage(id){
+  document.querySelectorAll(".page-view").forEach(p=>p.style.display="none");
+  const pg = document.getElementById("page-"+id);
+  if(pg) pg.style.display="block";
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  const match = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
+  if(match) match.classList.add("active");
+  closeDrop("profile-drop");
+  closeDrop("lang-ctrl-drop");
+  if(id==="certificates") {
+    setTimeout(()=>{
+      const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+      const currentName = session && session.name ? session.name : 'Author';
+      renderCert('Conference Certificate', 'Research Conference', currentName, 'completed', new Date().toLocaleDateString('en-IN', {year:'numeric',month:'long',day:'numeric'}), 'Conference Hall');
+      loadCertificates();
+    },100);
+  }
+  if(id==="notifications") loadNotifications();
+  if(id==="conferences") renderConferences();
+  if(id==="papers") setTimeout(()=>loadPapersWithCertificates(),100);
+  if(id==="overview") { setTimeout(()=>{ renderChart(); updateDashboardStats(); },100); }
+}
+
+/* ── Greeting ── */
+(function(){
+  const h=new Date().getHours();
+  const g=h<12?"Good morning":h<17?"Good afternoon":"Good evening";
+  const el=document.getElementById("greeting-msg");
+  if(el) el.textContent=`${g}, Madhav 👋`;
+})();
+
+/* ── Toast ── */
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.style.opacity="1"; t.style.transform="translateX(-50%) translateY(0)";
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>{t.style.opacity="0";t.style.transform="translateX(-50%) translateY(20px)";},2600);
+}
+
+async function fetchJson(url, options = {}, retries = 2){
+  let lastError = null;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`HTTP ${res.status}${text ? `: ${text.slice(0, 120)}` : ''}`);
+      }
+      return await res.json();
+    } catch (error) {
+      lastError = error;
+      if (attempt < retries) {
+        await new Promise(resolve => setTimeout(resolve, 300 * (attempt + 1)));
+        continue;
+      }
+    }
+  }
+  console.warn('fetchJson failed for', url, lastError);
+  return null;
+}
+
+/* ── Mark all read ── */
+function markAllRead(){
+  document.querySelectorAll(".notif-dot").forEach(d=>d.classList.add("read"));
+  showToast("All notifications marked as read ✅");
+}
+
+/* ── Logout ── */
+function handleLogout(){
+  if(confirm("Are you sure you want to logout?")) logout();
+}
+
+/* ── Save profile ── */
+function saveProfile(){
+  const n=document.getElementById("edit-name").value;
+  document.getElementById("topbar-name").textContent=n.split(" ")[0];
+  document.getElementById("topbar-avatar").textContent=n[0]||"U";
+  document.getElementById("profile-hero-name").textContent=n;
+  document.getElementById("profile-big-avatar").textContent=n[0]||"U";
+  document.getElementById("drop-name").textContent=n;
+  showToast("Profile saved ✅");
+}
+
+/* ── Conferences ── */
+async function renderConferences(){
+  const grid=document.getElementById("conf-grid");
+  if(!grid) return;
+  try{
+    const confs = await fetchJson('/api/conferences', { credentials: 'same-origin' });
+    if(!confs) throw new Error('failed');
+    grid.innerHTML = confs.map(c=>{
+      const now=new Date(); const dl=new Date(c.deadline);
+      const days=Math.ceil((dl-now)/86400000);
+      return `<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;box-shadow:0 2px 12px rgba(91,61,246,.07);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 32px rgba(91,61,246,.13)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--violet),var(--coral));"></div>
+        <h3 style="font-family:'Fraunces',serif;font-size:1rem;margin-bottom:8px;margin-top:6px;">${escapeHtml(c.name)}</h3>
+        <p style="font-size:.82rem;color:var(--ink-2);margin-bottom:12px;">📍 ${escapeHtml(c.venue||'')}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+          <span style="background:var(--violet-t2);border:1px solid var(--border);padding:3px 10px;border-radius:8px;font-size:.75rem;color:var(--ink-2);">📅 ${new Date(c.conf_date).toLocaleDateString()}</span>
+          <span style="background:${days<7?'var(--rose-t)':'var(--amber-t)'};border:1px solid ${days<7?'#fcb5b7':'#f5d080'};padding:3px 10px;border-radius:8px;font-size:.75rem;color:${days<7?'#b91c1c':'#9a6510'};">⏰ ${days}d left</span>
+        </div>
+        <div style="font-size:.8rem;color:var(--ink-2);line-height:1.7;">
+          <div><strong>Venue:</strong> ${escapeHtml(c.venue||'Not specified')}</div>
+          <div><strong>Deadline:</strong> ${new Date(c.deadline).toLocaleDateString()}</div>
+          <div><strong>Theme:</strong> ${escapeHtml(c.description || 'Research and innovation')}</div>
+        </div>
+      </div>`;
+    }).join("");
+  }catch(e){ console.error(e); grid.innerHTML = '<div style="color:var(--ink-2);padding:12px;">Failed to load conferences</div>'; }
+}
+
+let selectedConferenceId = null;
+function selectConference(id,name){ selectedConferenceId = id; const sel = document.getElementById('submit-conf-select'); if(sel) sel.value = id; showPage('submit'); showToast(`Selected: ${name}`); }
+
+// populate conference options into the submit form
+async function populateConferenceOptions(){
+  try{
+    const confs = await fetchJson('/api/conferences', { credentials: 'same-origin' });
+    if(!confs) return;
+    const sel = document.getElementById('submit-conf-select');
+    if(sel){
+      sel.innerHTML = '<option value="">— Select a Conference —</option>' + confs.map(c=>`<option value="${c.id}">${c.name} — ${c.venue||''}</option>`).join('');
+      if(selectedConferenceId) sel.value = selectedConferenceId;
+    }
+  }catch(e){ console.error(e); }
+}
+
+async function submitPaper(){
+  const titleEl = document.querySelector('#page-submit input[type="text"]');
+  const keywordsEl = document.querySelector('#page-submit input[placeholder*="Keywords"]');
+  const abstractEl = document.querySelector('#page-submit textarea[placeholder*="concise summary"]');
+  const confSelect = document.getElementById('submit-conf-select');
+  const fileInput = document.getElementById('submit-file');
+  const title = titleEl ? titleEl.value.trim() : '';
+  const keywords = keywordsEl ? keywordsEl.value.trim() : '';
+  const abstract = abstractEl ? abstractEl.value.trim() : '';
+  const confId = confSelect ? confSelect.value : selectedConferenceId;
+  if(!title || !confId){ showToast('Please provide title and select a conference'); return; }
+  const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+  if(!session || !session.id){ showToast('Not logged in'); return; }
+
+  let file_path = '';
+  if(fileInput && fileInput.files && fileInput.files.length){
+    const fd = new FormData(); fd.append('file', fileInput.files[0]);
+    try{
+      const up = await fetch('/api/upload',{method:'POST',credentials:'same-origin',body:fd});
+      if(up.ok){ const j = await up.json(); file_path = j.file_path || ''; }
+    }catch(e){ console.error(e); }
+  }
+
+  try{
+    const res = await fetch('/api/papers',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,abstract,keywords,author_id:session.id,conference_id:confId,file_path})});
+    if(!res.ok) throw new Error('submit failed');
+    await res.json();
+    showToast('Paper submitted successfully! ✅');
+    // refresh admin/author pages
+    setTimeout(()=>{ showPage('overview'); try{ if(typeof loadPapers==='function') loadPapers(); }catch(e){} try{ if(typeof loadMyPapers==='function') loadMyPapers(); }catch(e){} },800);
+  }catch(e){ console.error(e); showToast('Submit failed'); }
+}
+
+// ensure conference options are ready when opening submit / conferences
+document.addEventListener('DOMContentLoaded', ()=>{ populateConferenceOptions(); loadPapersWithCertificates(); loadNotifications(); loadCertificates(); updateDashboardStats(); });
+
+async function loadMyPapers(){
+  try{
+    const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+    if(!session || !session.id) return;
+    const res = await fetch(`/api/papers?author_id=${session.id}`,{credentials:'same-origin'});
+    if(!res.ok) return;
+    const rows = await res.json();
+    const container = document.getElementById('my-submissions');
+    if(!container) return;
+    container.innerHTML = rows.map(r=>{
+      const status = r.status||'submitted';
+      const badge = status==='accepted'?'<span class="badge badge-accepted">Accepted</span>':status==='under_review'?'<span class="badge badge-review">Review</span>':'<span class="badge badge-submitted">'+status+'</span>';
+      return `<div class="paper-item"><div class="paper-dot" style="background:var(--violet);"></div><div class="paper-info"><div class="paper-title">${escapeHtml(r.title||'')}</div><div class="paper-conf">${escapeHtml(r.conference_name||'')}</div></div>${badge}</div>`;
+    }).join('\n');
+  }catch(e){ console.error(e); }
+}
+
+async function updateDashboardStats(){
+  try{
+    const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+    if(!session || !session.id) return;
+
+    const [papers, conferences, certs] = await Promise.all([
+      fetchJson(`/api/papers?author_id=${session.id}`, { credentials: 'same-origin' }),
+      fetchJson('/api/conferences', { credentials: 'same-origin' }),
+      fetchJson(`/api/certificates?user_id=${session.id}`, { credentials: 'same-origin' })
+    ]);
+
+    if(!papers || !conferences || !certs) return;
+
+    const allNumbers = document.querySelectorAll('.stat-c .stat-c-num');
+    if(allNumbers.length >= 4){
+      const accepted = papers.filter(p => (p.status || '').toLowerCase() === 'accepted').length;
+      const pending = papers.filter(p => (p.status || '').toLowerCase() === 'under_review' || (p.status || '').toLowerCase() === 'submitted').length;
+      allNumbers[0].textContent = papers.length;
+      allNumbers[1].textContent = accepted;
+      allNumbers[2].textContent = pending;
+      allNumbers[3].textContent = conferences.length;
+    }
+
+    const certBadge = document.querySelector('.profile-hero-badge:nth-child(2)');
+    if(certBadge) certBadge.textContent = `🎓 ${certs.length} Certificates`;
+  }catch(e){ console.error(e); }
+}
+
+async function loadNotifications(){
+  try{
+    const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+    if(!session || !session.id) return;
+    const rows = await fetchJson(`/api/notifications?user_id=${session.id}`, { credentials: 'same-origin' });
+    if(!rows) return;
+
+    const unread = rows.filter(r => Number(r.is_read) === 0).length;
+    const badge = document.querySelector('.nav-item[onclick*="notifications"] .nav-badge');
+    if(badge){ badge.textContent = unread; badge.style.display = unread ? 'inline-flex' : 'none'; }
+
+    const container = document.querySelector('#page-notifications .panel-body');
+    if(container){
+      if(!rows.length){
+        container.innerHTML = '<div style="padding:18px;color:var(--ink-2);text-align:center;">No notifications yet.</div>';
+        return;
+      }
+      container.innerHTML = rows.slice(0,8).map(n => {
+        const time = n.created_at ? new Date(n.created_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+        return `<div class="notif-list-item"><div class="notif-dot-wrap"><div class="notif-dot ${Number(n.is_read) ? 'read' : ''}"></div></div><div><div class="notif-text">${escapeHtml(n.message || '')}</div><div class="notif-time">${escapeHtml(time)}</div></div></div>`;
+      }).join('');
+    }
+  }catch(e){ console.error(e); }
+}
+
+async function loadCertificates(){
+  try{
+    const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+    if(!session || !session.id) return;
+    const rows = await fetchJson(`/api/certificates?user_id=${session.id}`, { credentials: 'same-origin' });
+    const list = document.getElementById('cert-list');
+    if(!list) return;
+    if(!rows || !rows.length){
+      list.innerHTML = '<div class="cert-card"><div class="cert-icon">🎓</div><div class="cert-info"><div class="cert-name">No certificates generated yet</div><div class="cert-conf">Accepted conference papers will appear here after completion.</div></div></div>';
+      return;
+    }
+    list.innerHTML = rows.map(cert => {
+      const type = cert.cert_type || 'acceptance';
+      const icon = type === 'completed' ? '🎖' : type === 'best_paper' ? '🏆' : '📜';
+      const name = type === 'completed' ? 'Conference Completion Certificate' : type === 'best_paper' ? 'Best Paper Award' : type === 'participation' ? 'Participation Certificate' : 'Paper Acceptance Certificate';
+      const issued = cert.issued_at ? new Date(cert.issued_at).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'}) : 'Pending';
+      return `
+        <div class="cert-card">
+          <div class="cert-icon">${icon}</div>
+          <div class="cert-info">
+            <div class="cert-name">${escapeHtml(name)}</div>
+            <div class="cert-conf">${escapeHtml(cert.conference_name || 'Conference')} — ${escapeHtml(cert.paper_title || 'Research Paper')}</div>
+            <div class="cert-date">Issued: ${escapeHtml(issued)}</div>
+          </div>
+          <button class="cert-download" onclick="showCertModal(${cert.id},'${String(cert.conference_name || '').replace(/'/g, "\\'")}', '${cert.conference_date ? new Date(cert.conference_date).toLocaleDateString('en-IN') : 'TBD'}', '${String(cert.paper_title || '').replace(/'/g, "\\'")}', '${String(cert.venue || '').replace(/'/g, "\\'")}', '${String(type).replace(/'/g, "\\'")}', '${issued}')">⬇ View</button>
+        </div>
+      `;
+    }).join('');
+  }catch(e){ console.error(e); }
+}
+
+window.addEventListener('load', ()=>{ try{ populateConferenceOptions(); loadPapersWithCertificates(); loadNotifications(); loadCertificates(); updateDashboardStats(); if(typeof loadEvents==='function') loadEvents(); if(typeof loadMyPapers==='function') loadMyPapers(); }catch(e){} });
+
+setInterval(()=>{
+  try{
+    if(document.getElementById('page-papers') && document.getElementById('page-papers').style.display !== 'none'){
+      loadPapersWithCertificates();
+    }
+    loadNotifications();
+    loadCertificates();
+    updateDashboardStats();
+  }catch(e){ console.error(e); }
+}, 15000);
+
+/* ── Activity Chart ── */
+let actChart = null;
+function renderChart(){
+  const canvas = document.getElementById("activityChart");
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if(actChart) { actChart.destroy(); actChart=null; }
+  const isDark = document.documentElement.getAttribute("data-theme")==="dark";
+  const gridCol = isDark ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.06)";
+  const textCol = isDark ? "#9d96c8" : "#5b5484";
+
+  actChart = new Chart(ctx, {
+    type:"line",
+    data:{
+      labels:["Jan","Feb","Mar","Apr","May","Jun","Jul"],
+      datasets:[{
+        label:"Submissions",
+        data:[1,2,1,3,2,4,2],
+        fill:true,
+        borderColor:"#5b3df6",
+        backgroundColor:"rgba(91,61,246,.12)",
+        tension:.45,
+        pointBackgroundColor:"#5b3df6",
+        pointRadius:5,
+        pointHoverRadius:7,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:"#1a1040",titleColor:"#e8e3ff",bodyColor:"#9d96c8",padding:10,cornerRadius:10}},
+      scales:{
+        x:{grid:{color:gridCol},ticks:{color:textCol,font:{size:11}}},
+        y:{grid:{color:gridCol},ticks:{color:textCol,font:{size:11},stepSize:1},beginAtZero:true,max:6}
+      }
+    }
+  });
+}
+
+function switchChart(type, btn){
+  document.querySelectorAll(".ctab").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  const isDark = document.documentElement.getAttribute("data-theme")==="dark";
+  const gridCol = isDark?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)";
+  const textCol = isDark?"#9d96c8":"#5b5484";
+  if(!actChart) return;
+  if(type==="submissions"){
+    actChart.data.datasets[0].data=[1,2,1,3,2,4,2];
+    actChart.data.datasets[0].borderColor="#5b3df6";
+    actChart.data.datasets[0].backgroundColor="rgba(91,61,246,.12)";
+    actChart.data.datasets[0].pointBackgroundColor="#5b3df6";
+    actChart.data.datasets[0].label="Submissions";
+  } else {
+    actChart.data.datasets[0].data=[0,1,0,1,1,2,1];
+    actChart.data.datasets[0].borderColor="#00c896";
+    actChart.data.datasets[0].backgroundColor="rgba(0,200,150,.1)";
+    actChart.data.datasets[0].pointBackgroundColor="#00c896";
+    actChart.data.datasets[0].label="Accepted";
+  }
+  actChart.update();
+}
+
+/* ── Certificate renderer ── */
+let currentCertificateData = null;
+
+function getCurrentUserName(){
+  try{
+    const session = JSON.parse(localStorage.getItem('cms_session') || 'null');
+    return (session && session.name) ? session.name : 'Author';
+  } catch (e) {
+    return 'Author';
+  }
+}
+
+function certificateLabel(type){
+  if (type === 'completed') return 'Conference Completion Certificate';
+  if (type === 'best_paper') return 'Best Paper Award';
+  if (type === 'participation') return 'Participation Certificate';
+  return 'Certificate of Acceptance';
+}
+
+function renderCert(paper, conf, name, certType = 'acceptance', issuedDate = null, venue = ''){
+  currentCertificateData = {
+    paperTitle: paper || 'Research Paper',
+    confName: conf || 'Conference',
+    participantName: name || getCurrentUserName(),
+    certType,
+    issuedDate: issuedDate || new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }),
+    venue: venue || 'Conference Venue'
+  };
+
+  const canvas = document.getElementById("cert-canvas");
+  if(!canvas) return;
+  canvas.width=900; canvas.height=620;
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#fdfbff";
+  ctx.fillRect(0,0,900,620);
+
+  ctx.strokeStyle="#5b3df6";
+  ctx.lineWidth=8;
+  ctx.strokeRect(20,20,860,580);
+
+  ctx.strokeStyle="#d5cbff";
+  ctx.lineWidth=2;
+  ctx.strokeRect(32,32,836,556);
+
+  [[36,36],[864,36],[36,584],[864,584]].forEach(([x,y])=>{
+    ctx.fillStyle="#5b3df6";
+    ctx.beginPath(); ctx.arc(x,y,8,0,Math.PI*2); ctx.fill();
+  });
+
+  const grad = ctx.createLinearGradient(0,0,900,0);
+  grad.addColorStop(0,"#5b3df6");
+  grad.addColorStop(1,"#a855f7");
+  ctx.fillStyle=grad;
+  ctx.fillRect(20,20,860,92);
+
+  ctx.fillStyle="#fff";
+  ctx.textAlign="center";
+  ctx.font="bold 13px 'Segoe UI', sans-serif";
+  ctx.fillText("CONFERENCE MANAGEMENT SYSTEM", 450, 54);
+  ctx.font="bold 22px Georgia, serif";
+  ctx.fillText(certificateLabel(certType), 450, 90);
+
+  ctx.font="60px serif";
+  ctx.fillText(certType === 'best_paper' ? '🏆' : certType === 'participation' ? '🎖' : certType === 'completed' ? '🎓' : '✅', 450, 180);
+
+  ctx.fillStyle="#1a1040";
+  ctx.font="15px 'Segoe UI', sans-serif";
+  ctx.fillText("This is to certify that", 450, 230);
+
+  ctx.font="bold 32px Georgia, serif";
+  ctx.fillStyle="#5b3df6";
+  const participant = (name || getCurrentUserName()).trim();
+  ctx.fillText(participant, 450, 278);
+
+  const nw = ctx.measureText(participant).width;
+  ctx.strokeStyle="#5b3df6";
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(450-nw/2,285);
+  ctx.lineTo(450+nw/2,285);
+  ctx.stroke();
+
+  ctx.fillStyle="#1a1040";
+  ctx.font="15px 'Segoe UI', sans-serif";
+  const achievementText = certType === 'participation' ? 'has participated in the conference' : certType === 'best_paper' ? 'has been awarded for the paper' : certType === 'completed' ? 'has successfully completed the conference' : 'has presented the research paper';
+  ctx.fillText(achievementText, 450, 318);
+
+  ctx.font="bold 18px Georgia, serif";
+  ctx.fillStyle="#ff6b4a";
+  ctx.fillText(`"${paper || 'Research Paper'}"`, 450, 356);
+
+  ctx.fillStyle="#1a1040";
+  ctx.font="15px 'Segoe UI', sans-serif";
+  ctx.fillText(`at ${conf || 'the Conference'}`, 450, 390);
+  ctx.fillText(`Venue: ${venue || 'Conference Venue'}`, 450, 418);
+
+  ctx.font="13px 'Segoe UI', sans-serif";
+  ctx.fillStyle="#9590b0";
+  ctx.fillText(`Issued on: ${issuedDate || new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}`, 450, 452);
+
+  ctx.strokeStyle="#d5cbff";
+  ctx.lineWidth=1.5;
+  [190,710].forEach(x=>{
+    ctx.beginPath(); ctx.moveTo(x,510); ctx.lineTo(x+130,510); ctx.stroke();
+  });
+  ctx.fillStyle="#5b5484";
+  ctx.font="11px 'Segoe UI', sans-serif";
+  ctx.fillText("Program Chair",255,530);
+  ctx.fillText("Organizing Secretary",775,530);
+
+  ctx.font="10px 'Segoe UI', sans-serif";
+  ctx.fillStyle="#c8baff";
+  ctx.fillText(`Certificate ID: CMS-${Date.now().toString(36).toUpperCase()}`,450,565);
+}
+
+function downloadCurrentCertificate(){
+  const canvas = document.getElementById("cert-canvas");
+  if(!canvas) return;
+  const fileName = (currentCertificateData && currentCertificateData.confName)
+    ? `${(currentCertificateData.confName || 'certificate').replace(/[^a-z0-9]+/gi, '_').toLowerCase()}_${(currentCertificateData.participantName || 'author').replace(/[^a-z0-9]+/gi, '_').toLowerCase()}.png`
+    : `certificate_${Date.now()}.png`;
+  const link=document.createElement("a");
+  link.download=fileName;
+  link.href=canvas.toDataURL("image/png");
+  link.click();
+  showToast("Certificate downloaded ✅");
+}
+
+function downloadCert(paper, conf){
+  const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+  const authorName = session && session.name ? session.name : 'Author';
+  renderCert(paper, conf, authorName, 'acceptance');
+  showPage("certificates");
+  showToast("Certificate ready — download as PNG 🎓");
+}
+
+function saveCertPDF(){
+  downloadCurrentCertificate();
+}
+
+function downloadCertPDF(){
+  downloadCurrentCertificate();
+}
+
+window.downloadCertPDF = downloadCertPDF;
+window.downloadCurrentCertificate = downloadCurrentCertificate;
+window.showCertModal = showCertModal;
+window.closeCertModal = closeCertModal;
+
+/* ── Papers with Certificates ── */
+let allPapersData = [];
+let currentFilterStatus = 'all';
+
+async function loadPapersWithCertificates(){
+  try{
+    const session = JSON.parse(localStorage.getItem('cms_session')||'null');
+    if(!session || !session.id) return;
+
+    let data = await fetchJson(`/api/papers-with-certificates?author_id=${session.id}`, { credentials: 'same-origin' });
+    if(!data){
+      data = await fetchJson(`/api/papers?author_id=${session.id}`, { credentials: 'same-origin' });
+    }
+    if(!data) throw new Error('Failed to load papers');
+    allPapersData = data;
+    renderPapersTable();
+  }catch(e){
+    console.error(e);
+    const tbody = document.getElementById('papers-table-body');
+    if(tbody) tbody.innerHTML = '<tr style="border-bottom:1px solid var(--border);text-align:center;color:var(--rose);"><td colspan="5" style="padding:28px 16px;">Failed to load papers</td></tr>';
+  }
+}
+
+function renderPapersTable(){
+  const tbody = document.getElementById('papers-table-body');
+  if(!tbody) return;
+  
+  let filtered = allPapersData;
+  if(currentFilterStatus !== 'all'){
+    filtered = allPapersData.filter(p=>p.status === currentFilterStatus);
+  }
+  
+  if(filtered.length === 0){
+    tbody.innerHTML = '<tr style="border-bottom:1px solid var(--border);text-align:center;color:var(--ink-2);"><td colspan="5" style="padding:28px 16px;"><div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-direction:column;"><div style="font-size:2rem;opacity:.6;">📭</div><div>No papers found</div></div></td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = filtered.map(paper=>{
+    const status = paper.status||'submitted';
+    const statusBadge = status==='accepted'?'<span class="badge badge-accepted">✓ Accepted</span>':status==='under_review'?'<span class="badge badge-review">⏳ Under Review</span>':status==='rejected'?'<span class="badge badge-rejected">✗ Rejected</span>':'<span class="badge badge-submitted">◉ Submitted</span>';
+    const submittedDate = new Date(paper.submitted_at).toLocaleDateString('en-IN');
+    
+    let certCell = '<span style="color:var(--ink-3);font-size:.8rem;">—</span>';
+    if(paper.cert_id){
+      const confDate = paper.conf_date ? new Date(paper.conf_date).toLocaleDateString('en-IN') : 'TBD';
+      certCell = `<button class="cert-download" onclick="showCertModal(${paper.cert_id},'${escapeHtml(paper.conference_name)}','${confDate}','${escapeHtml(paper.title)}','${escapeHtml(paper.venue||'')}','${escapeHtml(paper.cert_type||'acceptance')}','${paper.issued_at ? new Date(paper.issued_at).toLocaleDateString('en-IN') : 'N/A'}')">🎓 View</button>`;
+    }
+    
+    return `<tr style="border-bottom:1px solid var(--border);transition:background .15s;">
+      <td style="padding:14px 16px;font-size:.87rem;font-weight:600;color:var(--ink);" title="${escapeHtml(paper.title)}">${escapeHtml(paper.title.substring(0,45))}${paper.title.length>45?'...':''}</td>
+      <td style="padding:14px 16px;font-size:.83rem;color:var(--ink-2);">${escapeHtml(paper.conference_name||'—')}</td>
+      <td style="padding:14px 16px;font-size:.82rem;color:var(--ink-3);">${submittedDate}</td>
+      <td style="padding:14px 16px;">${statusBadge}</td>
+      <td style="padding:14px 16px;">${certCell}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterPapersByStatus(status, btn){
+  document.querySelectorAll("#page-papers .ctab").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  currentFilterStatus = status;
+  renderPapersTable();
+}
+
+function showCertModal(certId, confName, confDate, paperTitle, venue, certType, issuedDate){
+  const modal = document.getElementById('cert-modal');
+  if(!modal) return;
+
+  const userName = getCurrentUserName();
+  renderCert(paperTitle, confName, userName, certType || 'acceptance', issuedDate || new Date().toLocaleDateString('en-IN', {year:'numeric',month:'long',day:'numeric'}), venue || 'Conference Venue');
+
+  document.getElementById('cert-modal-conf').textContent = confName;
+  document.getElementById('cert-modal-date').textContent = confDate;
+  document.getElementById('cert-modal-paper').textContent = paperTitle;
+  document.getElementById('cert-modal-venue').textContent = venue;
+  document.getElementById('cert-modal-issued').textContent = issuedDate;
+
+  const typeBadge = document.getElementById('cert-modal-type-badge');
+  if(typeBadge){
+    const typeLabel = certType === 'completed' ? '🎓 Conference Completion' : certType === 'best_paper' ? '🏆 Best Paper Award' : certType === 'participation' ? '🎖 Participation' : '📜 Acceptance';
+    const bgColor = certType === 'completed' ? 'var(--teal-t)' : certType === 'best_paper' ? 'var(--amber-t)' : certType === 'participation' ? 'var(--coral-t)' : 'var(--violet-t)';
+    const textColor = certType === 'completed' ? '#0a7a5a' : certType === 'best_paper' ? '#9a6510' : certType === 'participation' ? 'var(--coral-d)' : 'var(--violet-d)';
+    typeBadge.textContent = typeLabel;
+    typeBadge.style.background = bgColor;
+    typeBadge.style.color = textColor;
+  }
+
+  modal.style.display='flex';
+  modal.setAttribute('data-cert-id', certId);
+}
+
+function closeCertModal(){
+  const modal = document.getElementById('cert-modal');
+  if(modal) modal.style.display='none';
+}
+
+document.addEventListener('click',e=>{
+  const modal = document.getElementById('cert-modal');
+  if(modal && e.target === modal) closeCertModal();
+});
+
+/* ── Init ── */
+window.addEventListener("load",()=>{
+  renderChart();
+  // set lang label
+  const l = localStorage.getItem("cms_lang")||"en";
+  const lb=document.getElementById("lctrl-label");
+  if(lb) lb.textContent=langLabels[l]||l.toUpperCase();
+  document.querySelectorAll(".lang-item[data-lang]").forEach(el=>{
+    el.classList.toggle("active",el.dataset.lang===l);
+  });
+});
+</script>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+async function loadEvents(){
+  try{
+    const res = await fetch('/api/conferences',{credentials:'same-origin'});
+    if(!res.ok) return;
+    const rows = await res.json();
+    const container = document.getElementById('events-list');
+    if(!container) return;
+    container.innerHTML = rows.slice(0,5).map(r=>{
+      const d = new Date(r.conf_date);
+      const day = d.getDate(); const month = d.toLocaleString(undefined,{month:'short'});
+      return `<div class="event-item"><div class="event-date-box"><div class="event-day">${day}</div><div class="event-month">${month}</div></div><div class="event-info"><div class="event-name">${escapeHtml(r.name)}</div><div class="event-loc">📍 ${escapeHtml(r.venue||'')}</div><div style="margin-top:6px;"><span class="badge badge-submitted">Open</span></div></div></div>`;
+    }).join('');
+  }catch(e){console.error(e);} }
+function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+window.addEventListener('load',()=>{ loadEvents(); });
+</script>
+</body>
+</html>

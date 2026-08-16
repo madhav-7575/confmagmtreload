@@ -1,0 +1,43 @@
+/* ═══════════════════════════════════════════════════════════
+   CMS — Shared Design Tokens
+   The standalone dashboards (author/admin/reviewer/login) are
+   self-contained with inline <style> blocks and do NOT require
+   this file. It's included for:
+     - the public index.html shell if you choose to extend it
+     - any future pages that link /static/css/style.css
+     - keeping one source of truth for the brand palette
+   ═══════════════════════════════════════════════════════════ */
+
+:root{
+  --ink:#1a1040;--ink-2:#5b5484;--ink-3:#9590b0;
+  --paper:#f7f5ff;--card:#ffffff;--border:#ebe5ff;--border-2:#d5cbff;
+  --violet:#5b3df6;--violet-d:#3f20d4;--violet-dd:#2c1c8f;
+  --violet-t:#ede9ff;--violet-t2:#f5f2ff;
+  --coral:#ff6b4a;--coral-d:#e5502f;--coral-t:#fff2ee;
+  --teal:#00c896;--teal-t:#e0fff6;
+  --amber:#f5a623;--amber-t:#fff8e6;
+  --rose:#e5484d;--rose-t:#ffeaea;
+  --sh-md:0 8px 28px rgba(91,61,246,.12);
+  --sh-lg:0 20px 50px rgba(91,61,246,.18);
+}
+
+[data-theme="dark"]{
+  --ink:#e8e3ff;--ink-2:#9d96c8;--ink-3:#6b6489;
+  --paper:#0d0b1a;--card:#16132a;--border:#2a2448;--border-2:#3d3570;
+  --violet-t:#1e1640;--violet-t2:#18122e;--coral-t:#2a1410;
+  --teal-t:#071f18;--amber-t:#1f1608;--rose-t:#1f0b0c;
+}
+
+*{box-sizing:border-box;}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  transition:background .3s,color .3s;
+}
+
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700;border:1px solid transparent;}
+.badge-submitted{background:#ede9ff;color:#4f2dcc;border-color:#c8baff;}
+.badge-review{background:var(--amber-t);color:#9a6510;border-color:#f5d080;}
+.badge-accepted{background:var(--teal-t);color:#0a7a5a;border-color:#6ddbb9;}
+.badge-rejected{background:var(--rose-t);color:#b91c1c;border-color:#fcb5b7;}
